@@ -1,3 +1,5 @@
 # Preface {.unnumbered}
 
 This is the training workshop textbook.
+
+![](cover.png){fig-align="left" width=50%}

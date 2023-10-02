@@ -7,31 +7,24 @@
     "text": "Preface\nThis is the training workshop textbook."
   },
   {
-    "objectID": "02-processing.html",
-    "href": "02-processing.html",
-    "title": "",
+    "objectID": "intro.html",
+    "href": "intro.html",
+    "title": "1  Introduction",
     "section": "",
-    "text": "Processing\nThis is a section that provides a walk-through experience for spectral data processing and analysis."
+    "text": "This is a section that gives an overview about soil spectroscopy."
   },
   {
-    "objectID": "01-intro.html",
-    "href": "01-intro.html",
-    "title": "",
+    "objectID": "processing.html",
+    "href": "processing.html",
+    "title": "2  Processing",
     "section": "",
-    "text": "Introduction\nThis is a section that gives an overview about soil spectroscopy."
+    "text": "This is a section that provides a walk-through experience for spectral data processing and analysis."
   },
   {
-    "objectID": "references.html",
-    "href": "references.html",
-    "title": "",
+    "objectID": "modeling.html",
+    "href": "modeling.html",
+    "title": "3  Modeling",
     "section": "",
-    "text": "References"
-  },
-  {
-    "objectID": "03-modeling.html",
-    "href": "03-modeling.html",
-    "title": "",
-    "section": "",
-    "text": "Modeling\nIn this section we introduce the modeling with spectroscopy data for soil properties estimation."
+    "text": "In this section we introduce the modeling with spectroscopy data for soil properties estimation."
   }
 ]

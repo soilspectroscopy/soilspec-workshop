@@ -4,6 +4,16 @@ project:
 
 book:
   title: "Soil spectroscopy training workshop"
+  page-footer:
+    left: |
+      This textbook was written by Jose L. Safanelli, Robert Minarik,
+      Jonathan Sanderman, and Tomislav Hengl.
+    right: |
+      This book was built with <a href="https://quarto.org/">Quarto</a>.
+  site-url: https://soilspectroscopy.github.io/soilspec-workshop/
+  repo-url: https://github.com/soilspectroscopy/soilspec-workshop/
+  repo-branch: main
+  repo-actions: [edit, issue]
   author:
     - name: José Lucas Safanelli
       orcid: 0000-0001-5410-5762
@@ -24,9 +34,9 @@ book:
   date: "10/2/2023"
   chapters:
     - index.qmd
-    - 01-intro.qmd
-    - 02-processing.qmd
-    - 03-modeling.qmd
+    - intro.qmd
+    - processing.qmd
+    - modeling.qmd
     - references.qmd
 
 bibliography: references.bib
