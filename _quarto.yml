@@ -1,0 +1,40 @@
+project:
+  type: book
+
+book:
+  title: "Soil spectroscopy training workshop"
+  author:
+    - name: José Lucas Safanelli
+      orcid: 0000-0001-5410-5762
+      email: jsafanelli@woodwellclimate.org
+      affiliations: Woodwell Climate Research Center
+    - name: Robert Minarik
+      orcid: 0000-0002-5654-1522
+      email: robert.minarik@opengeohub.org
+      affiliations: OpenGeoHub Foundation
+    - name: Jonathan Sanderman
+      orcid: 0000-0002-3215-1706
+      email: jsanderman@woodwellclimate.org
+      affiliations: Woodwell Climate Research Center
+    - name: Tomislav Hengl
+      orcid: 0000-0002-9921-5129
+      email: tom.hengl@opengeohub.org
+      affiliations: OpenGeoHub Foundation
+  date: "10/2/2023"
+  chapters:
+    - index.qmd
+    - 01-intro.qmd
+    - 02-processing.qmd
+    - 03-modeling.qmd
+    - references.qmd
+
+bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+  pdf:
+    documentclass: scrreprt
+
+editor: visual
+
