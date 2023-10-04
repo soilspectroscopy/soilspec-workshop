@@ -1,3 +1,0 @@
-# Modeling
-
-In this section we introduce the modeling with spectroscopy data for soil properties estimation.

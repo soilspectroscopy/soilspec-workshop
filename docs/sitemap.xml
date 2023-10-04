@@ -2,22 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://soilspectroscopy.github.io/soilspec-workshop/index.html</loc>
-    <lastmod>2023-10-02T22:12:55.121Z</lastmod>
+    <lastmod>2023-10-04T15:59:13.287Z</lastmod>
   </url>
   <url>
-    <loc>https://soilspectroscopy.github.io/soilspec-workshop/intro.html</loc>
-    <lastmod>2023-10-02T22:13:04.070Z</lastmod>
+    <loc>https://soilspectroscopy.github.io/soilspec-workshop/editable/intro.html</loc>
+    <lastmod>2023-10-04T15:59:15.013Z</lastmod>
   </url>
   <url>
-    <loc>https://soilspectroscopy.github.io/soilspec-workshop/processing.html</loc>
-    <lastmod>2023-10-02T22:13:05.333Z</lastmod>
+    <loc>https://soilspectroscopy.github.io/soilspec-workshop/editable/processing.html</loc>
+    <lastmod>2023-10-04T15:59:12.777Z</lastmod>
   </url>
   <url>
-    <loc>https://soilspectroscopy.github.io/soilspec-workshop/modeling.html</loc>
-    <lastmod>2023-10-02T22:13:06.427Z</lastmod>
+    <loc>https://soilspectroscopy.github.io/soilspec-workshop/editable/modeling.html</loc>
+    <lastmod>2023-10-04T15:59:12.777Z</lastmod>
   </url>
   <url>
-    <loc>https://soilspectroscopy.github.io/soilspec-workshop/references.html</loc>
-    <lastmod>2023-10-02T22:13:06.926Z</lastmod>
+    <loc>https://soilspectroscopy.github.io/soilspec-workshop/editable/references.html</loc>
+    <lastmod>2023-10-04T15:59:25.663Z</lastmod>
   </url>
 </urlset>

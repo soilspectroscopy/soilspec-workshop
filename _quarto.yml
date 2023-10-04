@@ -3,10 +3,10 @@ project:
   output-dir: docs
 
 book:
-  title: "Soil spectroscopy training workshop"
+  title: "Training workshop on soil spectroscopy"
   page-footer:
     left: |
-      This textbook was written by Jose L. Safanelli, Robert Minarik,
+      This booklet was written by Jose L. Safanelli, Robert Minarik,
       Jonathan Sanderman, and Tomislav Hengl.
     right: |
       This book was built with <a href="https://quarto.org/">Quarto</a>.
@@ -34,10 +34,10 @@ book:
   date: "10/2/2023"
   chapters:
     - index.qmd
-    - intro.qmd
-    - processing.qmd
-    - modeling.qmd
-    - references.qmd
+    - editable/intro.qmd
+    - editable/processing.qmd
+    - editable/modeling.qmd
+    - editable/references.qmd
 
 bibliography: references.bib
 
@@ -47,5 +47,5 @@ format:
   pdf:
     documentclass: scrreprt
 
-editor: visual
+editor: source
 
