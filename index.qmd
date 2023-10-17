@@ -1,5 +1,57 @@
 # Welcome! {.unnumbered}
 
-This is the booklet for the training workshop on soil spectroscopy held at the tri-society meeting in Oct/Nov 2023.
+Welcome to our training workshop on soil spectroscopy! This is in-person event that is being held in St Louis, MO, at the tri-societies meeting 2023.
+
+Soil spectroscopy, specifically [**Diffuse Reflectance Infrared (DRIFT) spectroscopy**](https://en.wikipedia.org/wiki/Diffuse_reflectance_infrared_Fourier_transform_spectroscopy), is rapidly becoming a common tool for soil scientists in academia and in industry.
+
+One of the most popular uses of soil spectroscopy is for the rapid and low-cost estimation of a number of key soil properties.
+
+This workshop touch on the basics of soil spectroscopy including project design, considerations for building a spectral library, working with large public spectral libraries and model building and prediction.
+
+Most of the learning will focus on this last topic using freely available [**R programming language**](https://www.r-project.org/about.html). Participants are expected to bring their own laptops with the latest versions of R and RStudio installed.
+
+# Prerequisites {.unnumbered}
+
+We have shared by email two links for subscribing to [Mattermost](https://mattermost.com/) and to our dedicated **Channel**. Let's use it for chatting and sharing questions!
+
+Similarly, to learn more about your experience with R, we have shared a **pre-workshop survey** on the basics of R programming.
+
+In any case, this training is mostly focused on the use of **tidy** programming principles with pipe operators, leveraging the R packages from the [**tidyverse**](https://www.tidyverse.org/) like **tibble**, **tidyr** and **ggplot2**.
+
+If you are interested in getting started in R using tidy packages and principles, we strongly recommend vising the [**R 4 Data Science**](https://r4ds.had.co.nz/) book page:
+
+- For installing R and RStudio, it is recommended to check the [**Prerequisites page**](https://r4ds.had.co.nz/introduction.html#prerequisites) section.  
+- Learning how to set a basic project on RStudio is neatly described in [**Workflow: projects**](https://r4ds.had.co.nz/workflow-projects.html).  
+- We are going to have several demonstrations of [**data import**](https://r4ds.had.co.nz/data-import.html) and [**wrangling**](https://r4ds.had.co.nz/transform.html#transform) using pipe operations along with plot visualizations by [**ggplot**](https://r4ds.had.co.nz/data-visualisation.html).  
+
+Other spectral operations, like importing raw files, preprocessing, compression, and modeling will be done with dedicated libraries, e.g. [**asdreader**](https://github.com/pierreroudier/asdreader), [**opusreader2**](https://spectral-cockpit.github.io/opusreader2/), [**prospectr**](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html), [**pls**](https://cran.r-project.org/web/packages/pls/vignettes/pls-manual.pdf), [**resemble**](https://cran.r-project.org/web/packages/resemble/vignettes/resemble.html), and others.
+
+# Recommended literature {.unnumbered}
+
+The fundamentals of infrared spectroscopy are well presented in [Johnston & Aochi (2018)](https://doi.org/10.2136/sssabookser5.3.c10), while [Wadoux et al. (2021)](https://doi.org/10.1007/978-3-030-64896-1) provides a great walk-through of soil spectral inference in R.
+
+- Johnston, C. T., & Aochi, Y. O. (2018). Fourier Transform Infrared and Raman Spectroscopy (pp. 269–321). <https://doi.org/10.2136/sssabookser5.3.c10>
+
+- Wadoux, A. M. J.-C., Malone, B., Minasny, B., Fajardo, M., & McBratney, A. B. (2021). Soil Spectral Inference with R. In Progress in Soil Science. Springer International Publishing. <https://doi.org/10.1007/978-3-030-64896-1>
+
+- Ng, W., Minasny, B., Jeon, S. H., & McBratney, A. (2022). Mid-infrared spectroscopy for accurate measurement of an extensive set of soil properties for assessing soil functions. Soil Security, 6, 100043. <https://doi.org/10.1016/j.soisec.2022.100043>
+
+- Shepherd, K. D., Ferguson, R., Hoover, D., van Egmond, F., Sanderman, J., & Ge, Y. (2022). A global soil spectral calibration library and estimation service. Soil Security, 7, 100061. <https://doi.org/10.1016/j.soisec.2022.100061>
+
+- Soil Spectroscopy for Global Good. Open Soil Spectral Library. <https://soilspectroscopy.github.io/ossl-manual/>
+
+# Disclaimer {.unnumbered}
+
+Woodwell Climate Research Center, University of Florida, OpenGeoHub foundation and its suppliers and licensors hereby disclaim all warranties of any kind, express or implied, including, without limitation, the warranties of merchantability, fitness for a particular purpose and non-infringement. Neither Woodwell Climate Research Center, University of Florida, OpenGeoHub foundation nor its suppliers and licensors, makes any warranty that the Website will be error free or that access thereto will be continuous or uninterrupted. You understand that you download from, or otherwise obtain content or services through, the Website at your own discretion and risk.
+
+If you notice an error or outdated information, please submit a correction/pull request or open an issue.
+
+# License
+
+This website/book and attached software is free to use, and is licensed under the MIT License. The OSSL training data and models, if not otherwise indicated, are available either under the Creative Commons Attribution 4.0 International CC-BY and/or CC-BY-SA license / Open Data Commons Open Database License (ODbL) v1.0.
+
+# Acknowledgments {.unnumbered}
+
+[**Soil Spectroscopy for Global Good**](https://soilspectroscopy.org/) is organized by [**Woodwell Climate Research Center**](https://www.woodwellclimate.org/), [**University of Florida**](https://faculty.eng.ufl.edu/ktoddbrown/), and [**OpenGeoHub foundation**](https://opengeohub.org/). This project has been funded by the USDA National Institute of Food and Agriculture [award #2020-67021-32467](https://cris.nifa.usda.gov/cgi-bin/starfinder/0?path=fastlink1.txt&id=anon&pass=&search=R=89483&format=WEBFMT6NT).
 
 ![](img/cover.png){fig-align="center" width="50%"}

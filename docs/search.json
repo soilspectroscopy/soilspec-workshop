@@ -4,7 +4,7 @@
     "href": "index.html",
     "title": "Training workshop on soil spectroscopy",
     "section": "",
-    "text": "Welcome!\nThis is the booklet for the training workshop on soil spectroscopy held at the tri-society meeting in Oct/Nov 2023."
+    "text": "Welcome!\nWelcome to our training workshop on soil spectroscopy! This is in-person event that is being held in St Louis, MO, at the tri-societies meeting 2023.\nSoil spectroscopy, specifically Diffuse Reflectance Infrared (DRIFT) spectroscopy, is rapidly becoming a common tool for soil scientists in academia and in industry.\nOne of the most popular uses of soil spectroscopy is for the rapid and low-cost estimation of a number of key soil properties.\nThis workshop touch on the basics of soil spectroscopy including project design, considerations for building a spectral library, working with large public spectral libraries and model building and prediction.\nMost of the learning will focus on this last topic using freely available R programming language. Participants are expected to bring their own laptops with the latest versions of R and RStudio installed.\n\n\nPrerequisites\nWe have shared by email two links for subscribing to Mattermost and to our dedicated Channel. Let’s use it for chatting and sharing questions!\nSimilarly, to learn more about your experience with R, we have shared a pre-workshop survey on the basics of R programming.\nIn any case, this training is mostly focused on the use of tidy programming principles with pipe operators, leveraging the R packages from the tidyverse like tibble, tidyr and ggplot2.\nIf you are interested in getting started in R using tidy packages and principles, we strongly recommend vising the R 4 Data Science book page:\n\nFor installing R and RStudio, it is recommended to check the Prerequisites page section.\n\nLearning how to set a basic project on RStudio is neatly described in Workflow: projects.\n\nWe are going to have several demonstrations of data import and wrangling using pipe operations along with plot visualizations by ggplot.\n\nOther spectral operations, like importing raw files, preprocessing, compression, and modeling will be done with dedicated libraries, e.g. asdreader, opusreader2, prospectr, pls, resemble, and others.\n\n\nRecommended literature\nThe fundamentals of infrared spectroscopy are well presented in Johnston & Aochi (2018), while Wadoux et al. (2021) provides a great walk-through of soil spectral inference in R.\n\nJohnston, C. T., & Aochi, Y. O. (2018). Fourier Transform Infrared and Raman Spectroscopy (pp. 269–321). https://doi.org/10.2136/sssabookser5.3.c10\nWadoux, A. M. J.-C., Malone, B., Minasny, B., Fajardo, M., & McBratney, A. B. (2021). Soil Spectral Inference with R. In Progress in Soil Science. Springer International Publishing. https://doi.org/10.1007/978-3-030-64896-1\nNg, W., Minasny, B., Jeon, S. H., & McBratney, A. (2022). Mid-infrared spectroscopy for accurate measurement of an extensive set of soil properties for assessing soil functions. Soil Security, 6, 100043. https://doi.org/10.1016/j.soisec.2022.100043\nShepherd, K. D., Ferguson, R., Hoover, D., van Egmond, F., Sanderman, J., & Ge, Y. (2022). A global soil spectral calibration library and estimation service. Soil Security, 7, 100061. https://doi.org/10.1016/j.soisec.2022.100061\nSoil Spectroscopy for Global Good. Open Soil Spectral Library. https://soilspectroscopy.github.io/ossl-manual/\n\n\n\nDisclaimer\nWoodwell Climate Research Center, University of Florida, OpenGeoHub foundation and its suppliers and licensors hereby disclaim all warranties of any kind, express or implied, including, without limitation, the warranties of merchantability, fitness for a particular purpose and non-infringement. Neither Woodwell Climate Research Center, University of Florida, OpenGeoHub foundation nor its suppliers and licensors, makes any warranty that the Website will be error free or that access thereto will be continuous or uninterrupted. You understand that you download from, or otherwise obtain content or services through, the Website at your own discretion and risk.\nIf you notice an error or outdated information, please submit a correction/pull request or open an issue.\n\n\nLicense\nThis website/book and attached software is free to use, and is licensed under the MIT License. The OSSL training data and models, if not otherwise indicated, are available either under the Creative Commons Attribution 4.0 International CC-BY and/or CC-BY-SA license / Open Data Commons Open Database License (ODbL) v1.0.\n\n\nAcknowledgments\nSoil Spectroscopy for Global Good is organized by Woodwell Climate Research Center, University of Florida, and OpenGeoHub foundation. This project has been funded by the USDA National Institute of Food and Agriculture award #2020-67021-32467."
   },
   {
     "objectID": "editable/intro.html",
@@ -26,5 +26,54 @@
     "title": "3  Modeling",
     "section": "",
     "text": "In this section, we introduce the modeling pipeline of working with spectroscopy data for estimating soil properties."
+  },
+  {
+    "objectID": "index.html#prerequisites",
+    "href": "index.html#prerequisites",
+    "title": "Training workshop on soil spectroscopy",
+    "section": "Prerequisites",
+    "text": "Prerequisites\nWe have shared by email two links for subscribing to Mattermost and to our dedicated Channel. Let’s use it for chatting and sharing questions!\nSimilarly, to learn more about your experience with R, we have shared a pre-workshop survey on the basics of R programming.\nIn any case, this training is mostly focused on the use of tidy programming principles with pipe operators, leveraging the R packages from the tidyverse.\nIf you are interested in getting started in R using tidy packages and principles, we strongly recommend vising the R 4 Data Science book page.\nFor installing R and RStudio, it is recommended to visit the Prerequisites page section.\nIf you are interested\nLearning how to set a project a basic project on RStudio is neatly described in Workflow: projects."
+  },
+  {
+    "objectID": "index.html#prerequisites-1",
+    "href": "index.html#prerequisites-1",
+    "title": "Training workshop on soil spectroscopy",
+    "section": "Prerequisites",
+    "text": "Prerequisites"
+  },
+  {
+    "objectID": "index.html#disclaimer",
+    "href": "index.html#disclaimer",
+    "title": "Training workshop on soil spectroscopy",
+    "section": "Disclaimer",
+    "text": "Disclaimer\nWoodwell Climate Research Center, University of Florida, OpenGeoHub foundation and its suppliers and licensors hereby disclaim all warranties of any kind, express or implied, including, without limitation, the warranties of merchantability, fitness for a particular purpose and non-infringement. Neither Woodwell Climate Research Center, University of Florida, OpenGeoHub foundation nor its suppliers and licensors, makes any warranty that the Website will be error free or that access thereto will be continuous or uninterrupted. You understand that you download from, or otherwise obtain content or services through, the Website at your own discretion and risk.\nThis document is under construction. If you notice an error or outdated information, please submit a correction/pull request or open an issue."
+  },
+  {
+    "objectID": "index.html#acknowledments",
+    "href": "index.html#acknowledments",
+    "title": "Training workshop on soil spectroscopy",
+    "section": "Acknowledments",
+    "text": "Acknowledments\nSoil Spectroscopy for Global Good is organized by Woodwell Climate Research Center, University of Florida, and OpenGeoHub foundation. This project has been funded by the USDA National Institute of Food and Agriculture award #2020-67021-32467.\nWe bring together soil scientists, pedometricians, data scientists and engineers to overcome some of the current bottlenecks preventing wider and more efficient use of soil spectroscopy. For more info refer to: https://soilspectroscopy.org/."
+  },
+  {
+    "objectID": "index.html#license",
+    "href": "index.html#license",
+    "title": "Training workshop on soil spectroscopy",
+    "section": "License",
+    "text": "License\nThis website/book and attached software is free to use, and is licensed under the MIT License. The OSSL training data and models, if not otherwise indicated, are available either under the Creative Commons Attribution 4.0 International CC-BY and/or CC-BY-SA license / Open Data Commons Open Database License (ODbL) v1.0."
+  },
+  {
+    "objectID": "index.html#recommended-literature",
+    "href": "index.html#recommended-literature",
+    "title": "Training workshop on soil spectroscopy",
+    "section": "Recommended literature",
+    "text": "Recommended literature"
+  },
+  {
+    "objectID": "index.html#acknowledgments",
+    "href": "index.html#acknowledgments",
+    "title": "Training workshop on soil spectroscopy",
+    "section": "Acknowledgments",
+    "text": "Acknowledgments\nSoil Spectroscopy for Global Good is organized by Woodwell Climate Research Center, University of Florida, and OpenGeoHub foundation. This project has been funded by the USDA National Institute of Food and Agriculture award #2020-67021-32467.\nWe bring together soil scientists, pedometricians, data scientists and engineers to overcome some of the current bottlenecks preventing wider and more efficient use of soil spectroscopy. For more info refer to: https://soilspectroscopy.org/."
   }
 ]
