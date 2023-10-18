@@ -34,10 +34,10 @@ book:
   date: "10/2/2023"
   chapters:
     - index.qmd
-    - editable/intro.qmd
-    - editable/processing.qmd
-    - editable/modeling.qmd
-    - editable/references.qmd
+    - intro.qmd
+    - processing.qmd
+    - modeling.qmd
+    - references.qmd
 
 bibliography: references.bib
 
