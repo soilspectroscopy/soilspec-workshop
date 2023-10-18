@@ -16,15 +16,15 @@ We have shared by email two links for subscribing to [Mattermost](https://matter
 
 Similarly, to learn more about your experience with R, we have shared a **pre-workshop survey** on the basics of R programming.
 
-In any case, this training is mostly focused on the use of **tidy** programming principles with pipe operators, leveraging the R packages from the [**tidyverse**](https://www.tidyverse.org/) like **tibble**, **tidyr** and **ggplot2**.
+In any case, this training is mostly focused on the use of **tidy** programming principles with pipe operators, leveraging the R packages from the [**tidyverse**](https://www.tidyverse.org/) like **dplyr**, **tidyr** and **ggplot2**.
 
 If you are interested in getting started in R using tidy packages and principles, we strongly recommend vising the [**R 4 Data Science**](https://r4ds.had.co.nz/) book page:
 
-- For installing R and RStudio, it is recommended to check the [**Prerequisites page**](https://r4ds.had.co.nz/introduction.html#prerequisites) section.  
+- For installing R and RStudio, it is recommended to check the [**Prerequisites **](https://r4ds.had.co.nz/introduction.html#prerequisites) page.    
 - Learning how to set a basic project on RStudio is neatly described in [**Workflow: projects**](https://r4ds.had.co.nz/workflow-projects.html).  
-- We are going to have several demonstrations of [**data import**](https://r4ds.had.co.nz/data-import.html) and [**wrangling**](https://r4ds.had.co.nz/transform.html#transform) using pipe operations along with plot visualizations by [**ggplot**](https://r4ds.had.co.nz/data-visualisation.html).  
+- We are going to have several demonstrations of data [**import**](https://r4ds.had.co.nz/data-import.html) and [**wrangling**](https://r4ds.had.co.nz/transform.html#transform) by piped operations, and plot visualizations with [**ggplot**](https://r4ds.had.co.nz/data-visualisation.html).  
 
-Other spectral operations, like importing raw files, preprocessing, compression, and modeling will be done with dedicated libraries, e.g. [**asdreader**](https://github.com/pierreroudier/asdreader), [**opusreader2**](https://spectral-cockpit.github.io/opusreader2/), [**prospectr**](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html), [**pls**](https://cran.r-project.org/web/packages/pls/vignettes/pls-manual.pdf), [**resemble**](https://cran.r-project.org/web/packages/resemble/vignettes/resemble.html), and others.
+Other spectral operations, like importing raw files, preprocessing, compression, and modeling will be done with dedicated libraries, e.g., [**asdreader**](https://github.com/pierreroudier/asdreader), [**opusreader2**](https://spectral-cockpit.github.io/opusreader2/), [**prospectr**](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html), [**pls**](https://cran.r-project.org/web/packages/pls/vignettes/pls-manual.pdf), [**resemble**](https://cran.r-project.org/web/packages/resemble/vignettes/resemble.html), and others.
 
 # Recommended literature {.unnumbered}
 

@@ -1,3 +1,102 @@
 # Processing
 
-This is a section that provides a walk-through coding experience for spectral data processing and analysis.
+Required packages
+```{r setup, message=FALSE, warning=FALSE}
+library("tidyverse")
+library("asdreader")
+library("opusreader2")
+```
+
+## Importing spectra
+
+In this section, we will dive into the basic processing operations of soil spectroscopy data. 
+
+At the beginning of a project, this involves importing text or raw binary files of spectral measurements, like `ASD` and `OPUS` files, and even other file formats that are commonly used across different software, like `CSV` files.
+
+For this, let's use some of the datasets shared through the [Open Soil Spectral Library (OSSL)](https://soilspectroscopy.github.io/ossl-manual/). The OSSL has data for different spectral regions: visible and near-infrared [`VisNIR`, 350-2500 nm], near-infrared [`NIR`, 1350-2550 nm], and middle-infrared (`MIR`, 4000-600 cm^-1^).
+
+A common raw format of `VisNIR` measurements is the `.asd`. This format is used across the Malvern Panalytical instruments, like the [ASD FieldSpec](https://www.malvernpanalytical.com/en/products/product-range/asd-range/fieldspec-range) models. In R, we can import `ASD` files using the **asdreader** package. After downloading an `.asd` file, we can use the function `asdreader::get_spectra()` by just indicating the file path. We can see the imported spectra is a matrix with 1 row and 2551 columns, with integer column names ranging from 350 to 2500 nm.
+
+```{r asdreader, message=FALSE, warning=FALSE}
+# Downloading an .asd file
+visnir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/101453MD01.asd"
+visnir.spectra.path <- "~/projects/temp/soilspec_training/file1.asd"
+
+download.file(url = visnir.spectra.url,
+              destfile = visnir.spectra.path,
+              mode = "wb")
+
+# Reading asd file
+visnir.spectra <- asdreader::get_spectra(visnir.spectra.path)
+
+# Inspecting the file
+class(visnir.spectra)
+dim(visnir.spectra)
+visnir.spectra[1,1:5]
+
+# Spectral range
+range(as.numeric(colnames(visnir.spectra)))
+```
+
+The same operation can be done with MIR measurements. The OPUS file (`.0`) is a common binary format across instruments of Bruker Optics GmbH & Co. From the original producers of **opusreader2**:
+
+> (...) **opusreader2** is a state-of-the-art [opus] binary reader. We recommend the package as a solid foundation for your spectroscopy workflow. It is modular and has no hard dependencies apart from base R. (...) The Bruker corporation manufactures reliable instruments but there is no official documentation of the OPUS file format.
+
+As the format is proprietary, [spectra-cockipit.space](https://spectral-cockpit.space/) and the open source community have cracked and reverse-engineered the binary files to be open directly in R. After downloading an `.0` file from the OSSL project, we can use the function `opusreader2::read_opus_single()` by just indicating the file path. We can see the imported spectra is a list with several information (metadata and spectral data), with floating number column names (wavenumbers, cm^-1^) ranging from 599.7663 to 7498.0428 cm^-1^.
+
+```{r opusreader2, message=FALSE, warning=FALSE}
+# Downloading an .asd file
+mir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/235157XS01.0"
+mir.spectra.path <- "~/projects/temp/soilspec_training/file2.0"
+
+download.file(url = mir.spectra.url,
+              destfile = mir.spectra.path,
+              mode = "wb")
+
+# Reading asd file
+mir.spectra <- opusreader2::read_opus_single(dsn = mir.spectra.path)
+
+# Inspecting the file
+class(mir.spectra)
+names(mir.spectra)
+
+# Spectra is stored in file$ab$data
+class(mir.spectra$ab$data)
+dim(mir.spectra$ab$data)
+
+# Spectral range
+range(as.numeric(colnames(mir.spectra$ab$data)))
+```
+
+In many cases, instead of importing the raw binary files, we can directly import `CSV` commonly exported from those instruments and their software. For example, there is an example `CSV` file exported from a Neospectra device that is also shared through the OSSL project.
+
+```{r read_csv, message=FALSE, warning=FALSE}
+# Downloading an csv output from Neospectra
+nir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/sample_neospectra_data.csv"
+nir.spectra.path <- "~/projects/temp/soilspec_training/file3.csv"
+
+download.file(url = nir.spectra.url,
+              destfile = nir.spectra.path,
+              mode = "wb")
+
+# Reading csv file
+nir.spectra <- readr::read_csv(nir.spectra.path)
+
+# Inspecting the file
+class(nir.spectra)
+nir.spectra[1:5,1:5]
+
+# Spectral range after removing first column
+range(as.numeric(colnames(nir.spectra[,-1])))
+```
+
+## Pivoting tables
+
+## Visualization
+
+## Resampling spectra
+
+## Preprocessing
+
+## Spectral compression and projection
+
