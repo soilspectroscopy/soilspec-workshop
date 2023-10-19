@@ -1,26 +1,39 @@
 # Processing
 
-Required packages
+In this section of the training workshop, we dive into the basic processing operations of soil spectroscopy data. This includes importing spectral data, making tabular and/or element-wise operations, visualization, resampling, preprocessing, and compression.
+
+At the end, we will produce two files using a specific processing pipeline (`train.csv` and `test.csv`) that will be employed in the next Modeling section.
+
+It is important to mention that all files are being saved to a external working directory, i.e., we are not storing big files inside this GitHub repository.
+
+You can set an external folder as your working directory and RStudio project, and copy/paste the code chunks of this session into plain R scripts.
+
+Please, set the working directory (or create an RStudio project) in your local machine:
+```{r working_directory}
+my.wd <- "~/projects/temp/soilspec_training/"
+```
+
+A list of all required packages for this section are provided the following code chunk. You will see that some specific/special functions are highlighted in the text by linking back the function with the original package using the `package::function()` syntax:
 ```{r setup, message=FALSE, warning=FALSE}
 library("tidyverse")
 library("asdreader")
 library("opusreader2")
+library("prospectr")
 ```
 
 ## Importing spectra
 
-In this section, we will dive into the basic processing operations of soil spectroscopy data. 
+At the beginning of a project, we need to import the spectral measurements as raw binary files (like `ASD` and `OPUS` files) or other text/data file formats that are commonly used across different software, for instance, a `CSV` file.
 
-At the beginning of a project, this involves importing text or raw binary files of spectral measurements, like `ASD` and `OPUS` files, and even other file formats that are commonly used across different software, like `CSV` files.
+For learning some of the common operations of this part, let's use some of the datasets shared through the [Open Soil Spectral Library (OSSL)](https://soilspectroscopy.github.io/ossl-manual/). The OSSL has data for different spectral regions: visible and near-infrared [`VisNIR`, 350-2500 nm], near-infrared [`NIR`, 1350-2550 nm], and middle-infrared (`MIR`, 4000-600 cm^-1^).
 
-For this, let's use some of the datasets shared through the [Open Soil Spectral Library (OSSL)](https://soilspectroscopy.github.io/ossl-manual/). The OSSL has data for different spectral regions: visible and near-infrared [`VisNIR`, 350-2500 nm], near-infrared [`NIR`, 1350-2550 nm], and middle-infrared (`MIR`, 4000-600 cm^-1^).
-
-A common raw format of `VisNIR` measurements is the `.asd`. This format is used across the Malvern Panalytical instruments, like the [ASD FieldSpec](https://www.malvernpanalytical.com/en/products/product-range/asd-range/fieldspec-range) models. In R, we can import `ASD` files using the **asdreader** package. After downloading an `.asd` file, we can use the function `asdreader::get_spectra()` by just indicating the file path. We can see the imported spectra is a matrix with 1 row and 2551 columns, with integer column names ranging from 350 to 2500 nm.
+A common raw format for `VisNIR` measurements is the `.asd`. This format is used across the Malvern Panalytical instruments, like the [ASD FieldSpec](https://www.malvernpanalytical.com/en/products/product-range/asd-range/fieldspec-range) models. In R, we can import `ASD` files using the **asdreader** package. After downloading an example `.asd` file, we can use the function `asdreader::get_spectra()` by indicating the local file path. The imported spectra is a matrix with 1 row and 2551 columns, with column names as integer numbers (wavelength, nm) ranging from 350 to 2500 nm.
 
 ```{r asdreader, message=FALSE, warning=FALSE}
 # Downloading an .asd file
 visnir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/101453MD01.asd"
-visnir.spectra.path <- "~/projects/temp/soilspec_training/file1.asd"
+
+visnir.spectra.path <- paste0(my.wd, "file1.asd")
 
 download.file(url = visnir.spectra.url,
               destfile = visnir.spectra.path,
@@ -38,16 +51,17 @@ visnir.spectra[1,1:5]
 range(as.numeric(colnames(visnir.spectra)))
 ```
 
-The same operation can be done with MIR measurements. The OPUS file (`.0`) is a common binary format across instruments of Bruker Optics GmbH & Co. From the original producers of **opusreader2**:
+The same operation can be done with some MIR measurements. The `OPUS` file (`.0`) is a common binary file format used across the instruments of Bruker Optics GmbH & Co. According to the original producers of **opusreader2**:
 
 > (...) **opusreader2** is a state-of-the-art [opus] binary reader. We recommend the package as a solid foundation for your spectroscopy workflow. It is modular and has no hard dependencies apart from base R. (...) The Bruker corporation manufactures reliable instruments but there is no official documentation of the OPUS file format.
 
-As the format is proprietary, [spectra-cockipit.space](https://spectral-cockpit.space/) and the open source community have cracked and reverse-engineered the binary files to be open directly in R. After downloading an `.0` file from the OSSL project, we can use the function `opusreader2::read_opus_single()` by just indicating the file path. We can see the imported spectra is a list with several information (metadata and spectral data), with floating number column names (wavenumbers, cm^-1^) ranging from 599.7663 to 7498.0428 cm^-1^.
+As the `OPUS` format is proprietary, [spectra-cockipit.space](https://spectral-cockpit.space/) and the open source community have cracked and reverse-engineered the binary files to be open directly in R. After downloading an example `.0` file from the OSSL project, we can use the function `opusreader2::read_opus_single()` by just indicating the local file path. The imported spectra is a list with several information (metadata and spectral data), with the spectra having column names formatted as floating numbers (wavenumbers, cm^-1^) due to the Fourier Transformation, and ranging from 599.7663 to 7498.0428 cm^-1^.
 
 ```{r opusreader2, message=FALSE, warning=FALSE}
-# Downloading an .asd file
+# Downloading an .0 file
 mir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/235157XS01.0"
-mir.spectra.path <- "~/projects/temp/soilspec_training/file2.0"
+
+mir.spectra.path <- paste0(my.wd, "file2.0")
 
 download.file(url = mir.spectra.url,
               destfile = mir.spectra.path,
@@ -68,12 +82,13 @@ dim(mir.spectra$ab$data)
 range(as.numeric(colnames(mir.spectra$ab$data)))
 ```
 
-In many cases, instead of importing the raw binary files, we can directly import `CSV` commonly exported from those instruments and their software. For example, there is an example `CSV` file exported from a Neospectra device that is also shared through the OSSL project.
+In many cases, instead of importing the raw binary files, we can directly import a `CSV` exported from those spectral instruments and their accompanying software. For example, using an example `CSV` file exported from a Neospectra device that is also available through the OSSL project, the imported spectra is a table with scans in the rows, the first column as ID, and the spectra having column names formatted as floating numbers (wavelength, nm) due to the Fourier Transformation, ranging in this case, from 1350 to 2550 nm.
 
 ```{r read_csv, message=FALSE, warning=FALSE}
 # Downloading an csv output from Neospectra
 nir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/sample_neospectra_data.csv"
-nir.spectra.path <- "~/projects/temp/soilspec_training/file3.csv"
+
+nir.spectra.path <- paste0(my.wd, "file3.csv")
 
 download.file(url = nir.spectra.url,
               destfile = nir.spectra.path,
@@ -90,15 +105,117 @@ nir.spectra[1:5,1:5]
 range(as.numeric(colnames(nir.spectra[,-1])))
 ```
 
-## Pivoting tables
+## Tabular operations
 
-new text
+When we upload spectra into R, we usually need to perform some operations across rows, columns, or in a element-wise mode. For example, the measurement unit may differ across instruments and spectral ranges, so when we integrate different datasets, we need to harmonize the original datasets to a specific format.
+
+Using the Neospectra example dataset imported in the previous subsection, we can see that the scale of the measurements are provided in percent units. Rather than having the data in 0-100% percent units, we can transform it to reflectance factor units in the 0-1 interval and keep 5 decimal places of precision.
+
+
+```{r nir_reflectance}
+# Original data
+nir.spectra[1:5,1:5]
+
+# Spectra column names
+spectra.column.names <- nir.spectra %>%
+  select(-sample_id) %>%
+  names()
+
+# Transforming reflectance (%) to reflectance factor (decimal, 0-1)
+# Also, rounding to 5 decimal places of precision
+nir.spectra.rf <- nir.spectra %>%
+  mutate(across(all_of(spectra.column.names), ~round(.x/100, 5)))
+
+nir.spectra.rf[1:5,1:5]
+```
+
+We can also use the same element-wise operations to transform data in absorbance (`A`, in log10 units) or reflectance (`R`, reflectance factor 0-1). This is not run here, but the following equations and R code can be used:
+
+- Absorbance from reflectance: $$A=\log_{10}\left(\frac{1}{R}\right)$$ or `mutate(across(all_of(spectra.column.names), ~round(log10(1/.x), 5)))`.  
+- Reflectance from absorbance: $$R=\frac{1}{10^{A}}$$ or `mutate(across(all_of(spectra.column.names), ~round(1/(10^.x), 5)))`
 
 ## Visualization
 
+Another important operation is to to be able to visualize the spectra. For this task, we can use **ggplot2** package after pivoting the [wide] table to a long version that store the data in two new colums: wavelength (x variable) and reflectance (y variable).
+
+```{r visualization}
+## Pivot to long format
+nir.spectra.rf.long <- nir.spectra.rf %>%
+  pivot_longer(all_of(spectra.column.names),
+               names_to = "wavelength",
+               values_to = "reflectance") %>%
+  mutate(wavelength = as.numeric(wavelength),
+         reflectance = as.numeric(reflectance))
+
+head(nir.spectra.rf.long)
+
+## Visualization
+ggplot(data = nir.spectra.rf.long) +
+  geom_line(aes(x = wavelength, y = reflectance,
+                group = sample_id),
+            alpha = 0.5, linewidth = 0.5) +
+  theme_light()
+```
+
 ## Resampling spectra
+
+From the previous table views, we saw the spectral column headers are being represented by an uneven interval with floating numbers. We can resample or harmonize the spectra (using the **prospectr** R package) to a defined range with an even interval (e.g. 5 nm) using spline interpolation. For this, we need to use the spectra stored as a wide table.
+
+> NOTE: linear and spline interpolation do not work outside of the original range. If you have missing data out of the original range, you must use a different approach like imputation to fill the gaps.
+
+```{r interpolation}
+# Old columns, reversed, and as numeric
+old.wavelength <- as.numeric(rev(spectra.column.names))
+head(old.wavelength)
+
+# New columns, increasing order, spaced 5 nm
+new.wavelength <- seq(1350, 2550, by = 5)
+head(new.wavelength)
+
+# Selecting old spectra in increasing order
+# Parse to matrix (input of prospectr::resample)
+# Resample
+# Parse to tibble
+# Bind to original sample ids
+# NOTE: Dot (.) is used as a placeholder for the previous output of the pipe
+# NOTE: We can create quick internal pipes with brackets {}
+nir.spectra.rf.int <- nir.spectra.rf %>%
+  select(all_of(rev(spectra.column.names))) %>%
+  as.matrix() %>%
+  prospectr::resample(X = .,
+                      wav = old.wavelength,
+                      new.wav = new.wavelength,
+                      interpol = "spline") %>%
+  as_tibble() %>%
+  bind_cols({nir.spectra.rf %>%
+      select(sample_id)}, .)
+
+nir.spectra.rf.int[1:5,1:5]
+```
+
+The harmonization/resample results in the same spectral patterns, but now the data is well formatted.
+
+```{r visualization_resample}
+new.spectra.column.names <- as.character(new.wavelength)
+
+# We can pipe pivot, mutate, and ggplot all together
+nir.spectra.rf.int %>%
+  pivot_longer(all_of(new.spectra.column.names),
+               names_to = "wavelength",
+               values_to = "reflectance") %>%
+  mutate(wavelength = as.numeric(wavelength),
+         reflectance = as.numeric(reflectance)) %>%
+  ggplot(data = .) +
+  geom_line(aes(x = wavelength, y = reflectance, group = sample_id),
+            alpha = 0.5, linewidth = 0.5) +
+  theme_light()
+```
 
 ## Preprocessing
 
+New text.
+
 ## Spectral compression and projection
+
+New text.
 

@@ -124,6 +124,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   }
 }</script>
 
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 </head>
 
@@ -194,7 +195,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
    
   <ul>
   <li><a href="#importing-spectra" id="toc-importing-spectra" class="nav-link active" data-scroll-target="#importing-spectra"><span class="toc-section-number">2.1</span>  Importing spectra</a></li>
-  <li><a href="#pivoting-tables" id="toc-pivoting-tables" class="nav-link" data-scroll-target="#pivoting-tables"><span class="toc-section-number">2.2</span>  Pivoting tables</a></li>
+  <li><a href="#tabular-operations" id="toc-tabular-operations" class="nav-link" data-scroll-target="#tabular-operations"><span class="toc-section-number">2.2</span>  Tabular operations</a></li>
   <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization"><span class="toc-section-number">2.3</span>  Visualization</a></li>
   <li><a href="#resampling-spectra" id="toc-resampling-spectra" class="nav-link" data-scroll-target="#resampling-spectra"><span class="toc-section-number">2.4</span>  Resampling spectra</a></li>
   <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing"><span class="toc-section-number">2.5</span>  Preprocessing</a></li>
@@ -222,73 +223,83 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>Required packages</p>
+<p>In this section of the training workshop, we dive into the basic processing operations of soil spectroscopy data. This includes importing spectral data, making tabular and/or element-wise operations, visualization, resampling, preprocessing, and compression.</p>
+<p>At the end, we will produce two files using a specific processing pipeline (<code>train.csv</code> and <code>test.csv</code>) that will be employed in the next Modeling section.</p>
+<p>It is important to mention that all files are being saved to a external working directory, i.e., we are not storing big files inside this GitHub repository.</p>
+<p>You can set an external folder as your working directory and RStudio project, and copy/paste the code chunks of this session into plain R scripts.</p>
+<p>Please, set the working directory (or create an RStudio project) in your local machine:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tidyverse"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"asdreader"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"opusreader2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my.wd <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training/"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A list of all required packages for this section are provided the following code chunk. You will see that some specific/special functions are highlighted in the text by linking back the function with the original package using the <code>package::function()</code> syntax:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tidyverse"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"asdreader"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"opusreader2"</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"prospectr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="importing-spectra" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="importing-spectra"><span class="header-section-number">2.1</span> Importing spectra</h2>
-<p>In this section, we will dive into the basic processing operations of soil spectroscopy data.</p>
-<p>At the beginning of a project, this involves importing text or raw binary files of spectral measurements, like <code>ASD</code> and <code>OPUS</code> files, and even other file formats that are commonly used across different software, like <code>CSV</code> files.</p>
-<p>For this, let’s use some of the datasets shared through the <a href="https://soilspectroscopy.github.io/ossl-manual/">Open Soil Spectral Library (OSSL)</a>. The OSSL has data for different spectral regions: visible and near-infrared [<code>VisNIR</code>, 350-2500 nm], near-infrared [<code>NIR</code>, 1350-2550 nm], and middle-infrared (<code>MIR</code>, 4000-600 cm<sup>-1</sup>).</p>
-<p>A common raw format of <code>VisNIR</code> measurements is the <code>.asd</code>. This format is used across the Malvern Panalytical instruments, like the <a href="https://www.malvernpanalytical.com/en/products/product-range/asd-range/fieldspec-range">ASD FieldSpec</a> models. In R, we can import <code>ASD</code> files using the <strong>asdreader</strong> package. After downloading an <code>.asd</code> file, we can use the function <code>asdreader::get_spectra()</code> by just indicating the file path. We can see the imported spectra is a matrix with 1 row and 2551 columns, with integer column names ranging from 350 to 2500 nm.</p>
+<p>At the beginning of a project, we need to import the spectral measurements as raw binary files (like <code>ASD</code> and <code>OPUS</code> files) or other text/data file formats that are commonly used across different software, for instance, a <code>CSV</code> file.</p>
+<p>For learning some of the common operations of this part, let’s use some of the datasets shared through the <a href="https://soilspectroscopy.github.io/ossl-manual/">Open Soil Spectral Library (OSSL)</a>. The OSSL has data for different spectral regions: visible and near-infrared [<code>VisNIR</code>, 350-2500 nm], near-infrared [<code>NIR</code>, 1350-2550 nm], and middle-infrared (<code>MIR</code>, 4000-600 cm<sup>-1</sup>).</p>
+<p>A common raw format for <code>VisNIR</code> measurements is the <code>.asd</code>. This format is used across the Malvern Panalytical instruments, like the <a href="https://www.malvernpanalytical.com/en/products/product-range/asd-range/fieldspec-range">ASD FieldSpec</a> models. In R, we can import <code>ASD</code> files using the <strong>asdreader</strong> package. After downloading an example <code>.asd</code> file, we can use the function <code>asdreader::get_spectra()</code> by indicating the local file path. The imported spectra is a matrix with 1 row and 2551 columns, with column names as integer numbers (wavelength, nm) ranging from 350 to 2500 nm.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an .asd file</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>visnir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/101453MD01.asd"</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>visnir.spectra.path <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training/file1.asd"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> visnir.spectra.url,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> visnir.spectra.path,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Reading asd file</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>visnir.spectra <span class="ot">&lt;-</span> asdreader<span class="sc">::</span><span class="fu">get_spectra</span>(visnir.spectra.path)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspecting the file</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(visnir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an .asd file</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>visnir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/101453MD01.asd"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>visnir.spectra.path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(my.wd, <span class="st">"file1.asd"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> visnir.spectra.url,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> visnir.spectra.path,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Reading asd file</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>visnir.spectra <span class="ot">&lt;-</span> asdreader<span class="sc">::</span><span class="fu">get_spectra</span>(visnir.spectra.path)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspecting the file</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(visnir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "matrix" "array" </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(visnir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(visnir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]    1 2151</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>visnir.spectra[<span class="dv">1</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>visnir.spectra[<span class="dv">1</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>       350        351        352        353        354 
 0.09088564 0.09550782 0.09147028 0.08838938 0.08888854 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectral range</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(<span class="fu">as.numeric</span>(<span class="fu">colnames</span>(visnir.spectra)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectral range</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(<span class="fu">as.numeric</span>(<span class="fu">colnames</span>(visnir.spectra)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]  350 2500</code></pre>
 </div>
 </div>
-<p>The same operation can be done with MIR measurements. The OPUS file (<code>.0</code>) is a common binary format across instruments of Bruker Optics GmbH &amp; Co.&nbsp;From the original producers of <strong>opusreader2</strong>:</p>
+<p>The same operation can be done with some MIR measurements. The <code>OPUS</code> file (<code>.0</code>) is a common binary file format used across the instruments of Bruker Optics GmbH &amp; Co.&nbsp;According to the original producers of <strong>opusreader2</strong>:</p>
 <blockquote class="blockquote">
 <p>(…) <strong>opusreader2</strong> is a state-of-the-art [opus] binary reader. We recommend the package as a solid foundation for your spectroscopy workflow. It is modular and has no hard dependencies apart from base R. (…) The Bruker corporation manufactures reliable instruments but there is no official documentation of the OPUS file format.</p>
 </blockquote>
-<p>As the format is proprietary, <a href="https://spectral-cockpit.space/">spectra-cockipit.space</a> and the open source community have cracked and reverse-engineered the binary files to be open directly in R. After downloading an <code>.0</code> file from the OSSL project, we can use the function <code>opusreader2::read_opus_single()</code> by just indicating the file path. We can see the imported spectra is a list with several information (metadata and spectral data), with floating number column names (wavenumbers, cm<sup>-1</sup>) ranging from 599.7663 to 7498.0428 cm<sup>-1</sup>.</p>
+<p>As the <code>OPUS</code> format is proprietary, <a href="https://spectral-cockpit.space/">spectra-cockipit.space</a> and the open source community have cracked and reverse-engineered the binary files to be open directly in R. After downloading an example <code>.0</code> file from the OSSL project, we can use the function <code>opusreader2::read_opus_single()</code> by just indicating the local file path. The imported spectra is a list with several information (metadata and spectral data), with the spectra having column names formatted as floating numbers (wavenumbers, cm<sup>-1</sup>) due to the Fourier Transformation, and ranging from 599.7663 to 7498.0428 cm<sup>-1</sup>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an .asd file</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>mir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/235157XS01.0"</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>mir.spectra.path <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training/file2.0"</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> mir.spectra.url,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> mir.spectra.path,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Reading asd file</span></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>mir.spectra <span class="ot">&lt;-</span> opusreader2<span class="sc">::</span><span class="fu">read_opus_single</span>(<span class="at">dsn =</span> mir.spectra.path)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspecting the file</span></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an .0 file</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>mir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/235157XS01.0"</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>mir.spectra.path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(my.wd, <span class="st">"file2.0"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> mir.spectra.url,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> mir.spectra.path,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Reading asd file</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>mir.spectra <span class="ot">&lt;-</span> opusreader2<span class="sc">::</span><span class="fu">read_opus_single</span>(<span class="at">dsn =</span> mir.spectra.path)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspecting the file</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "list"</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(mir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(mir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "basic_metadata"                  "ab_data_param"                  
  [3] "ab"                              "quant_report_ab"                
@@ -303,40 +314,41 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 [21] "instrument"                      "lab_and_process_param_processed"
 [23] "info_block"                      "history"                        </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectra is stored in file$ab$data</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mir.spectra<span class="sc">$</span>ab<span class="sc">$</span>data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectra is stored in file$ab$data</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(mir.spectra<span class="sc">$</span>ab<span class="sc">$</span>data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "matrix" "array" </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(mir.spectra<span class="sc">$</span>ab<span class="sc">$</span>data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(mir.spectra<span class="sc">$</span>ab<span class="sc">$</span>data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]    1 3578</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectral range</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(<span class="fu">as.numeric</span>(<span class="fu">colnames</span>(mir.spectra<span class="sc">$</span>ab<span class="sc">$</span>data)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectral range</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(<span class="fu">as.numeric</span>(<span class="fu">colnames</span>(mir.spectra<span class="sc">$</span>ab<span class="sc">$</span>data)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]  599.7663 7498.0428</code></pre>
 </div>
 </div>
-<p>In many cases, instead of importing the raw binary files, we can directly import <code>CSV</code> commonly exported from those instruments and their software. For example, there is an example <code>CSV</code> file exported from a Neospectra device that is also shared through the OSSL project.</p>
+<p>In many cases, instead of importing the raw binary files, we can directly import a <code>CSV</code> exported from those spectral instruments and their accompanying software. For example, using an example <code>CSV</code> file exported from a Neospectra device that is also available through the OSSL project, the imported spectra is a table with scans in the rows, the first column as ID, and the spectra having column names formatted as floating numbers (wavelength, nm) due to the Fourier Transformation, ranging in this case, from 1350 to 2550 nm.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an csv output from Neospectra</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>nir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/sample_neospectra_data.csv"</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>nir.spectra.path <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training/file3.csv"</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> nir.spectra.url,</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> nir.spectra.path,</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Reading csv file</span></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>nir.spectra <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(nir.spectra.path)</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspecting the file</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(nir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an csv output from Neospectra</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>nir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/sample_neospectra_data.csv"</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>nir.spectra.path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(my.wd, <span class="st">"file3.csv"</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> nir.spectra.url,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> nir.spectra.path,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">mode =</span> <span class="st">"wb"</span>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Reading csv file</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>nir.spectra <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(nir.spectra.path)</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspecting the file</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(nir.spectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "spec_tbl_df" "tbl_df"      "tbl"         "data.frame" </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>nir.spectra[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>nir.spectra[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 5
   sample_id `2549.999982` `2541.176458` `2532.413785` `2523.711336`
@@ -347,28 +359,170 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 4         4          35.2          35.3          35.4          35.6
 5         5          49.0          49.0          49.1          49.3</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectral range after removing first column</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(<span class="fu">as.numeric</span>(<span class="fu">colnames</span>(nir.spectra[,<span class="sc">-</span><span class="dv">1</span>])))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectral range after removing first column</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">range</span>(<span class="fu">as.numeric</span>(<span class="fu">colnames</span>(nir.spectra[,<span class="sc">-</span><span class="dv">1</span>])))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1350 2550</code></pre>
 </div>
 </div>
 </section>
-<section id="pivoting-tables" class="level2" data-number="2.2">
-<h2 data-number="2.2" class="anchored" data-anchor-id="pivoting-tables"><span class="header-section-number">2.2</span> Pivoting tables</h2>
-<p>new text</p>
+<section id="tabular-operations" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="tabular-operations"><span class="header-section-number">2.2</span> Tabular operations</h2>
+<p>When we upload spectra into R, we usually need to perform some operations across rows, columns, or in a element-wise mode. For example, the measurement unit may differ across instruments and spectral ranges, so when we integrate different datasets, we need to harmonize the original datasets to a specific format.</p>
+<p>Using the Neospectra example dataset imported in the previous subsection, we can see that the scale of the measurements are provided in percent units. Rather than having the data in 0-100% percent units, we can transform it to reflectance factor units in the 0-1 interval and keep 5 decimal places of precision.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Original data</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>nir.spectra[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  sample_id `2549.999982` `2541.176458` `2532.413785` `2523.711336`
+      &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;
+1         1          22.1          22.2          22.3          22.4
+2         2          60.8          60.5          60.3          60.3
+3         3          51.5          51.5          51.6          51.7
+4         4          35.2          35.3          35.4          35.6
+5         5          49.0          49.0          49.1          49.3</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Spectra column names</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>spectra.column.names <span class="ot">&lt;-</span> nir.spectra <span class="sc">%&gt;%</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>sample_id) <span class="sc">%&gt;%</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Transforming reflectance (%) to reflectance factor (decimal, 0-1)</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Also, rounding to 5 decimal places of precision</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf <span class="ot">&lt;-</span> nir.spectra <span class="sc">%&gt;%</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(spectra.column.names), <span class="sc">~</span><span class="fu">round</span>(.x<span class="sc">/</span><span class="dv">100</span>, <span class="dv">5</span>)))</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  sample_id `2549.999982` `2541.176458` `2532.413785` `2523.711336`
+      &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;
+1         1         0.221         0.222         0.223         0.224
+2         2         0.608         0.605         0.603         0.603
+3         3         0.515         0.515         0.516         0.517
+4         4         0.352         0.353         0.354         0.356
+5         5         0.490         0.490         0.491         0.493</code></pre>
+</div>
+</div>
+<p>We can also use the same element-wise operations to transform data in absorbance (<code>A</code>, in log10 units) or reflectance (<code>R</code>, reflectance factor 0-1). This is not run here, but the following equations and R code can be used:</p>
+<ul>
+<li>Absorbance from reflectance: <span class="math display">\[A=\log_{10}\left(\frac{1}{R}\right)\]</span> or <code>mutate(across(all_of(spectra.column.names), ~round(log10(1/.x), 5)))</code>.<br>
+</li>
+<li>Reflectance from absorbance: <span class="math display">\[R=\frac{1}{10^{A}}\]</span> or <code>mutate(across(all_of(spectra.column.names), ~round(1/(10^.x), 5)))</code></li>
+</ul>
 </section>
 <section id="visualization" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="visualization"><span class="header-section-number">2.3</span> Visualization</h2>
+<p>Another important operation is to to be able to visualize the spectra. For this task, we can use <strong>ggplot2</strong> package after pivoting the [wide] table to a long version that store the data in two new colums: wavelength (x variable) and reflectance (y variable).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Pivot to long format</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf.long <span class="ot">&lt;-</span> nir.spectra.rf <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">all_of</span>(spectra.column.names),</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"wavelength"</span>,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"reflectance"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wavelength =</span> <span class="fu">as.numeric</span>(wavelength),</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">reflectance =</span> <span class="fu">as.numeric</span>(reflectance))</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(nir.spectra.rf.long)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 3
+  sample_id wavelength reflectance
+      &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;
+1         1      2550.       0.221
+2         1      2541.       0.222
+3         1      2532.       0.223
+4         1      2524.       0.224
+5         1      2515.       0.226
+6         1      2506.       0.228</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Visualization</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> nir.spectra.rf.long) <span class="sc">+</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> wavelength, <span class="at">y =</span> reflectance,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">group =</span> sample_id),</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="processing_files/figure-html/visualization-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 <section id="resampling-spectra" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="resampling-spectra"><span class="header-section-number">2.4</span> Resampling spectra</h2>
+<p>From the previous table views, we saw the spectral column headers are being represented by an uneven interval with floating numbers. We can resample or harmonize the spectra (using the <strong>prospectr</strong> R package) to a defined range with an even interval (e.g.&nbsp;5 nm) using spline interpolation. For this, we need to use the spectra stored as a wide table.</p>
+<blockquote class="blockquote">
+<p>NOTE: linear and spline interpolation do not work outside of the original range. If you have missing data out of the original range, you must use a different approach like imputation to fill the gaps.</p>
+</blockquote>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Old columns, reversed, and as numeric</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>old.wavelength <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">rev</span>(spectra.column.names))</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(old.wavelength)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1350.000 1352.487 1354.982 1357.486 1360.000 1362.524</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># New columns, increasing order, spaced 5 nm</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>new.wavelength <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1350</span>, <span class="dv">2550</span>, <span class="at">by =</span> <span class="dv">5</span>)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(new.wavelength)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1350 1355 1360 1365 1370 1375</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting old spectra in increasing order</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse to matrix (input of prospectr::resample)</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Resample</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse to tibble</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Bind to original sample ids</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: Dot (.) is used as a placeholder for the previous output of the pipe</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">NOTE</span><span class="co">: We can create quick internal pipes with brackets {}</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf.int <span class="ot">&lt;-</span> nir.spectra.rf <span class="sc">%&gt;%</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(<span class="fu">rev</span>(spectra.column.names))) <span class="sc">%&gt;%</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  prospectr<span class="sc">::</span><span class="fu">resample</span>(<span class="at">X =</span> .,</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>                      <span class="at">wav =</span> old.wavelength,</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>                      <span class="at">new.wav =</span> new.wavelength,</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>                      <span class="at">interpol =</span> <span class="st">"spline"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>({nir.spectra.rf <span class="sc">%&gt;%</span></span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(sample_id)}, .)</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf.int[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  sample_id `1350` `1355` `1360` `1365`
+      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+1         1  0.305  0.305  0.306  0.306
+2         2  0.602  0.603  0.605  0.606
+3         3  0.517  0.519  0.520  0.521
+4         4  0.476  0.479  0.480  0.480
+5         5  0.537  0.538  0.538  0.537</code></pre>
+</div>
+</div>
+<p>The harmonization/resample results in the same spectral patterns, but now the data is well formatted.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>new.spectra.column.names <span class="ot">&lt;-</span> <span class="fu">as.character</span>(new.wavelength)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a><span class="co"># We can pipe pivot, mutate, and ggplot all together</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf.int <span class="sc">%&gt;%</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">all_of</span>(new.spectra.column.names),</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"wavelength"</span>,</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"reflectance"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wavelength =</span> <span class="fu">as.numeric</span>(wavelength),</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">reflectance =</span> <span class="fu">as.numeric</span>(reflectance)) <span class="sc">%&gt;%</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data =</span> .) <span class="sc">+</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> wavelength, <span class="at">y =</span> reflectance, <span class="at">group =</span> sample_id),</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="processing_files/figure-html/visualization_resample-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 <section id="preprocessing" class="level2" data-number="2.5">
 <h2 data-number="2.5" class="anchored" data-anchor-id="preprocessing"><span class="header-section-number">2.5</span> Preprocessing</h2>
+<p>New text.</p>
 </section>
 <section id="spectral-compression-and-projection" class="level2" data-number="2.6">
 <h2 data-number="2.6" class="anchored" data-anchor-id="spectral-compression-and-projection"><span class="header-section-number">2.6</span> Spectral compression and projection</h2>
+<p>New text.</p>
 
 
 </section>
