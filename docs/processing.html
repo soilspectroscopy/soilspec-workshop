@@ -409,12 +409,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li>Absorbance from reflectance: <span class="math display">\[A=\log_{10}\left(\frac{1}{R}\right)\]</span> or <code>mutate(across(all_of(spectra.column.names), ~round(log10(1/.x), 5)))</code>.<br>
 </li>
-<li>Reflectance from absorbance: <span class="math display">\[R=\frac{1}{10^{A}}\]</span> or <code>mutate(across(all_of(spectra.column.names), ~round(1/(10^.x), 5)))</code></li>
+<li>Reflectance from absorbance: <span class="math display">\[R=\frac{1}{10^{A}}\]</span> or <code>mutate(across(all_of(spectra.column.names), ~round(1/(10^.x), 5)))</code>.</li>
 </ul>
 </section>
 <section id="visualization" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="visualization"><span class="header-section-number">2.3</span> Visualization</h2>
-<p>Another important operation is to to be able to visualize the spectra. For this task, we can use <strong>ggplot2</strong> package after pivoting the [wide] table to a long version that store the data in two new colums: wavelength (x variable) and reflectance (y variable).</p>
+<p>Another important operation is to to be able to visualize the spectra. For this task, we can use <strong>ggplot2</strong> package after pivoting the [wide] table to a long version that store the data in two new columns: wavelength (<code>x</code> variable) and reflectance (<code>y</code> variable).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Pivot to long format</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf.long <span class="ot">&lt;-</span> nir.spectra.rf <span class="sc">%&gt;%</span></span>
@@ -449,7 +449,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="resampling-spectra" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="resampling-spectra"><span class="header-section-number">2.4</span> Resampling spectra</h2>
-<p>From the previous table views, we saw the spectral column headers are being represented by an uneven interval with floating numbers. We can resample or harmonize the spectra (using the <strong>prospectr</strong> R package) to a defined range with an even interval (e.g.&nbsp;5 nm) using spline interpolation. For this, we need to use the spectra stored as a wide table.</p>
+<p>From the previous table views, we saw the spectral column headers are being represented by an uneven interval with floating numbers. We can resample or harmonize the spectra (using the <strong>prospectr</strong> R package) to a defined range with an even interval (e.g.&nbsp;2 nm) using spline interpolation. For this, we need to use the spectra stored as a wide table.</p>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -470,11 +470,11 @@ Note
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1350.000 1352.487 1354.982 1357.486 1360.000 1362.524</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># New columns, increasing order, spaced 5 nm</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>new.wavelength <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1350</span>, <span class="dv">2550</span>, <span class="at">by =</span> <span class="dv">5</span>)</span>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># New columns, increasing order, spaced 2 nm</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>new.wavelength <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">1350</span>, <span class="dv">2550</span>, <span class="at">by =</span> <span class="dv">2</span>)</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(new.wavelength)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 1350 1355 1360 1365 1370 1375</code></pre>
+<pre><code>[1] 1350 1352 1354 1356 1358 1360</code></pre>
 </div>
 </div>
 <div class="callout-tip callout callout-style-default callout-captioned">
@@ -510,13 +510,13 @@ Tip
 <span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf.int[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 5
-  sample_id `1350` `1355` `1360` `1365`
+  sample_id `1350` `1352` `1354` `1356`
       &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-1         1  0.305  0.305  0.306  0.306
-2         2  0.602  0.603  0.605  0.606
-3         3  0.517  0.519  0.520  0.521
-4         4  0.476  0.479  0.480  0.480
-5         5  0.537  0.538  0.538  0.537</code></pre>
+1         1  0.305  0.305  0.305  0.305
+2         2  0.602  0.602  0.603  0.604
+3         3  0.517  0.518  0.518  0.519
+4         4  0.476  0.477  0.478  0.479
+5         5  0.537  0.537  0.537  0.538</code></pre>
 </div>
 </div>
 <p>The harmonization/resample results in the same spectral patterns, but now the data is well formatted.</p>
@@ -553,7 +553,69 @@ Tip
 </section>
 <section id="preprocessing" class="level2" data-number="2.5">
 <h2 data-number="2.5" class="anchored" data-anchor-id="preprocessing"><span class="header-section-number">2.5</span> Preprocessing</h2>
-<p>New text.</p>
+<p><strong>prospectr</strong> is a very useful package for signal processing and chemometrics as it contains various utilities for working with spectral data. As stated in the package vignette:</p>
+<blockquote class="blockquote">
+<p>The aim of spectral <a href="#preprocessing">preprocessing</a> is to [enhance] signal quality before modeling as well as [to] remove physical information from the spectra. Applying a pre-treatment can increase the repeatability/reproducibility of the method, model robustness and accuracy, although there are no guarantees this will actually work.</p>
+</blockquote>
+<p>There are several algorithms available through <strong>prospectr</strong> and elsewhere, e.g.&nbsp;listed in <a href="https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#signal-processing">Table 1</a> of its vignette. However, in this section we are going to showcase only a few that are more common: <a href="https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#savitzky-golay-filtering">Savitzky–Golay (SG) smoothing and derivatives</a>, and <a href="https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#scatter-and-baseline-corrections">Standard Normal Variate (SNV)</a>.</p>
+<p><a href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky–Golay</a> is an algorithm that fits a moving local polynomial regression that can smooth and/or derive the spectra (using the fitted polynomial) to enhance the signal quality and absorption features. The parameters are the polynomial order (<code>p</code>), the half-window size to sample and fit the spectra (<code>w</code>), the derivative order (<code>m</code>, where <code>m = 0</code> is used for smoothing and <code>m &gt; 1</code> are the respective derivatives), and the spacing interval (<code>delta.wav</code>). When we use the SG algorithm, the edges of the spectral range are reduced by one half-window size minus the center.</p>
+<p>Except for <code>delta.wav</code>, we can fine tune all of these parameters to find the best preprocessing combination, although several studies have already explore this in the literature and we can adopt what has been recommended. In this example, we are going to use the first-derivative of a second order polynomial regression with half-window size of 11 nm.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select spectra columns</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse to matrix (input of prospectr::savitzkyGolay)</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply preprocessing</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse to tibble</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Bind the spectra to id column</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a>nir.spectra.sg <span class="ot">&lt;-</span> nir.spectra.rf.int <span class="sc">%&gt;%</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(new.spectra.column.names)) <span class="sc">%&gt;%</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">savitzkyGolay</span>(<span class="at">X =</span> ., <span class="at">p =</span> <span class="dv">2</span>, <span class="at">w =</span> <span class="dv">11</span>, <span class="at">m =</span> <span class="dv">1</span>, <span class="at">delta.wav =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  as_tibble <span class="sc">%&gt;%</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>({nir.spectra.rf <span class="sc">%&gt;%</span></span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(sample_id)}, .)</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>nir.spectra.sg[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  sample_id    `1360`      `1362`     `1364`      `1366`
+      &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;
+1         1 0.000112   0.000108    0.000101   0.0000887 
+2         2 0.000255   0.000236    0.000225   0.000223  
+3         3 0.000221   0.000212    0.000206   0.000201  
+4         4 0.000158   0.0000929   0.0000379 -0.00000238
+5         5 0.0000111 -0.00000283 -0.0000104 -0.0000139 </code></pre>
+</div>
+</div>
+<p>Moving-window first-derivatives are great because they preserve the orientation of the absorption features and enhance only the important regions of the spectra. For more complex spectra, however, this may hamper the interpretability.</p>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>dplyr</strong> allows us to use column selectors like <code>first()</code>, <code>everything()</code>, <code>all_of</code> etc. As we now have a shorter spectral range, rather than using <code>all_of(new.spectra.column.names)</code> we can replace it with <code>any_of(new.spectra.column.names)</code> to select any of the available columns within the predefined range of columns.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>nir.spectra.sg <span class="sc">%&gt;%</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(new.spectra.column.names),</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"wavelength"</span>,</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"reflectance"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wavelength =</span> <span class="fu">as.numeric</span>(wavelength),</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">reflectance =</span> <span class="fu">as.numeric</span>(reflectance)) <span class="sc">%&gt;%</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data =</span> .) <span class="sc">+</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> wavelength, <span class="at">y =</span> reflectance, <span class="at">group =</span> sample_id),</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="processing_files/figure-html/sg_visualization-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 <section id="spectral-compression-and-projection" class="level2" data-number="2.6">
 <h2 data-number="2.6" class="anchored" data-anchor-id="spectral-compression-and-projection"><span class="header-section-number">2.6</span> Spectral compression and projection</h2>

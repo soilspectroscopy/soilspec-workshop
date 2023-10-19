@@ -132,11 +132,11 @@ nir.spectra.rf[1:5,1:5]
 We can also use the same element-wise operations to transform data in absorbance (`A`, in log10 units) or reflectance (`R`, reflectance factor 0-1). This is not run here, but the following equations and R code can be used:
 
 - Absorbance from reflectance: $$A=\log_{10}\left(\frac{1}{R}\right)$$ or `mutate(across(all_of(spectra.column.names), ~round(log10(1/.x), 5)))`.  
-- Reflectance from absorbance: $$R=\frac{1}{10^{A}}$$ or `mutate(across(all_of(spectra.column.names), ~round(1/(10^.x), 5)))`
+- Reflectance from absorbance: $$R=\frac{1}{10^{A}}$$ or `mutate(across(all_of(spectra.column.names), ~round(1/(10^.x), 5)))`.
 
 ## Visualization
 
-Another important operation is to to be able to visualize the spectra. For this task, we can use **ggplot2** package after pivoting the [wide] table to a long version that store the data in two new colums: wavelength (x variable) and reflectance (y variable).
+Another important operation is to to be able to visualize the spectra. For this task, we can use **ggplot2** package after pivoting the [wide] table to a long version that store the data in two new columns: wavelength (`x` variable) and reflectance (`y` variable).
 
 ```{r visualization}
 ## Pivot to long format
@@ -159,7 +159,7 @@ ggplot(data = nir.spectra.rf.long) +
 
 ## Resampling spectra
 
-From the previous table views, we saw the spectral column headers are being represented by an uneven interval with floating numbers. We can resample or harmonize the spectra (using the **prospectr** R package) to a defined range with an even interval (e.g. 5 nm) using spline interpolation. For this, we need to use the spectra stored as a wide table.
+From the previous table views, we saw the spectral column headers are being represented by an uneven interval with floating numbers. We can resample or harmonize the spectra (using the **prospectr** R package) to a defined range with an even interval (e.g. 2 nm) using spline interpolation. For this, we need to use the spectra stored as a wide table.
 
 ::: {.callout-note}
 Linear and spline interpolation do not work outside of the original range. If you have missing data out of the original range, you must use a different approach like imputation to fill the gaps.
@@ -170,8 +170,8 @@ Linear and spline interpolation do not work outside of the original range. If yo
 old.wavelength <- as.numeric(rev(spectra.column.names))
 head(old.wavelength)
 
-# New columns, increasing order, spaced 5 nm
-new.wavelength <- seq(1350, 2550, by = 5)
+# New columns, increasing order, spaced 2 nm
+new.wavelength <- seq(1350, 2550, by = 2)
 head(new.wavelength)
 ```
 
@@ -224,7 +224,54 @@ nir.spectra.rf.int %>%
 
 ## Preprocessing
 
-New text.
+**prospectr** is a very useful package for signal processing and chemometrics as it contains various utilities for working with spectral data. As stated in the package vignette:
+
+> The aim of spectral [preprocessing] is to [enhance] signal quality before modeling as well as [to] remove physical information from the spectra. Applying a pre-treatment can increase the repeatability/reproducibility of the method, model robustness and accuracy, although there are no guarantees this will actually work.
+
+There are several algorithms available through **prospectr** and elsewhere, e.g. listed in [Table 1](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#signal-processing) of its vignette. However, in this section we are going to showcase only a few that are more common: [Savitzky–Golay (SG) smoothing and derivatives](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#savitzky-golay-filtering), and [Standard Normal Variate (SNV)](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#scatter-and-baseline-corrections).
+
+[Savitzky–Golay](https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter) is an algorithm that fits a moving local polynomial regression that can smooth and/or derive the spectra (using the fitted polynomial) to enhance the signal quality and absorption features. The parameters are the polynomial order (`p`), the half-window size to sample and fit the spectra (`w`), the derivative order (`m`, where `m = 0` is used for smoothing and `m > 1` are the respective derivatives), and the spacing interval (`delta.wav`). When we use the SG algorithm, the edges of the spectral range are reduced by one half-window size minus the center.
+
+Except for `delta.wav`, we can fine tune all of these parameters to find the best preprocessing combination, although several studies have already explore this in the literature and we can adopt what has been recommended. In this example, we are going to use the first-derivative of a second order polynomial regression with half-window size of 11 nm.
+
+```{r sg}
+# Select spectra columns
+# Parse to matrix (input of prospectr::savitzkyGolay)
+# Apply preprocessing
+# Parse to tibble
+# Bind the spectra to id column
+nir.spectra.sg <- nir.spectra.rf.int %>%
+  select(all_of(new.spectra.column.names)) %>%
+  as.matrix() %>%
+  savitzkyGolay(X = ., p = 2, w = 11, m = 1, delta.wav = 2) %>%
+  as_tibble %>%
+  as_tibble() %>%
+  bind_cols({nir.spectra.rf %>%
+      select(sample_id)}, .)
+
+nir.spectra.sg[1:5,1:5]
+```
+Moving-window first-derivatives are great because they preserve the orientation of the absorption features and enhance only the important regions of the spectra. For more complex spectra, however, this may hamper the interpretability.
+
+::: {.callout-tip}
+## Tip
+**dplyr** allows us to use column selectors like `first()`, `everything()`, `all_of` etc. As we now have a shorter spectral range, rather than using `all_of(new.spectra.column.names)` we can replace it with `any_of(new.spectra.column.names)` to select any of the available columns within the predefined range of columns.
+:::
+
+```{r sg_visualization}
+nir.spectra.sg %>%
+  pivot_longer(any_of(new.spectra.column.names),
+               names_to = "wavelength",
+               values_to = "reflectance") %>%
+  mutate(wavelength = as.numeric(wavelength),
+         reflectance = as.numeric(reflectance)) %>%
+  ggplot(data = .) +
+  geom_line(aes(x = wavelength, y = reflectance, group = sample_id),
+            alpha = 0.5, linewidth = 0.5) +
+  theme_light()
+```
+
+
 
 ## Spectral compression and projection
 
