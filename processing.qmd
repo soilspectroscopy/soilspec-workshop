@@ -92,6 +92,8 @@ range(as.numeric(colnames(nir.spectra[,-1])))
 
 ## Pivoting tables
 
+new text
+
 ## Visualization
 
 ## Resampling spectra
