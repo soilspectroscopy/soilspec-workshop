@@ -83,6 +83,25 @@ code span.st { color: #4070a0; } /* String */
 code span.va { color: #19177c; } /* Variable */
 code span.vs { color: #4070a0; } /* VerbatimString */
 code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 
@@ -199,7 +218,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization"><span class="toc-section-number">2.3</span>  Visualization</a></li>
   <li><a href="#resampling-spectra" id="toc-resampling-spectra" class="nav-link" data-scroll-target="#resampling-spectra"><span class="toc-section-number">2.4</span>  Resampling spectra</a></li>
   <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing"><span class="toc-section-number">2.5</span>  Preprocessing</a></li>
-  <li><a href="#spectral-compression-and-projection" id="toc-spectral-compression-and-projection" class="nav-link" data-scroll-target="#spectral-compression-and-projection"><span class="toc-section-number">2.6</span>  Spectral compression and projection</a></li>
+  <li><a href="#spectral-compression-and-projection" id="toc-spectral-compression-and-projection" class="nav-link" data-scroll-target="#spectral-compression-and-projection"><span class="toc-section-number">2.6</span>  Spectral compression and projection</a>
+  <ul class="collapse">
+  <li><a href="#neospectra-preparation" id="toc-neospectra-preparation" class="nav-link" data-scroll-target="#neospectra-preparation"><span class="toc-section-number">2.6.1</span>  Neospectra preparation</a></li>
+  <li><a href="#neospectra-compression" id="toc-neospectra-compression" class="nav-link" data-scroll-target="#neospectra-compression"><span class="toc-section-number">2.6.2</span>  Neospectra compression</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/soilspectroscopy/soilspec-workshop/edit/main/processing.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/soilspectroscopy/soilspec-workshop/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -225,18 +248,22 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <p>In this section of the training workshop, we dive into the basic processing operations of soil spectroscopy data. This includes importing spectral data, making tabular and/or element-wise operations, visualization, resampling, preprocessing, and compression.</p>
 <p>At the end, we will produce two files using a specific processing pipeline (<code>train.csv</code> and <code>test.csv</code>) that will be employed in the next Modeling section.</p>
-<p>It is important to mention that all files are being saved to a external working directory, i.e., we are not storing big files inside this GitHub repository.</p>
+<p>It is important to mention that all files are being saved to a external working directory, i.e., we are not storing big files inside this GitHub and book repository.</p>
 <p>You can set an external folder as your working directory and RStudio project, and copy/paste the code chunks of this session into plain R scripts.</p>
 <p>Please, set the working directory (or create an RStudio project) in your local machine:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my.wd <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training/"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my.wd <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training/"</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Or within an RStudio project</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>my.wd <span class="ot">&lt;-</span> <span class="fu">getwd</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>A list of all required packages for this section are provided the following code chunk. You will see that some specific/special functions are highlighted in the text by linking back the function with the original package using the <code>package::function()</code> syntax:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tidyverse"</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"asdreader"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"opusreader2"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"prospectr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"prospectr"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"qs"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"resemble"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="importing-spectra" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="importing-spectra"><span class="header-section-number">2.1</span> Importing spectra</h2>
@@ -555,11 +582,11 @@ Tip
 <h2 data-number="2.5" class="anchored" data-anchor-id="preprocessing"><span class="header-section-number">2.5</span> Preprocessing</h2>
 <p><strong>prospectr</strong> is a very useful package for signal processing and chemometrics as it contains various utilities for working with spectral data. As stated in the package vignette:</p>
 <blockquote class="blockquote">
-<p>The aim of spectral <a href="#preprocessing">preprocessing</a> is to [enhance] signal quality before modeling as well as [to] remove physical information from the spectra. Applying a pre-treatment can increase the repeatability/reproducibility of the method, model robustness and accuracy, although there are no guarantees this will actually work.</p>
+<p>The aim of spectral preprocessing is to enhance signal quality before modeling as well as to remove physical information from the spectra. Applying a pre-treatment can increase the repeatability/reproducibility of the method, model robustness and accuracy, although there are no guarantees this will actually work.</p>
 </blockquote>
 <p>There are several algorithms available through <strong>prospectr</strong> and elsewhere, e.g.&nbsp;listed in <a href="https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#signal-processing">Table 1</a> of its vignette. However, in this section we are going to showcase only a few that are more common: <a href="https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#savitzky-golay-filtering">Savitzky–Golay (SG) smoothing and derivatives</a>, and <a href="https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#scatter-and-baseline-corrections">Standard Normal Variate (SNV)</a>.</p>
 <p><a href="https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter">Savitzky–Golay</a> is an algorithm that fits a moving local polynomial regression that can smooth and/or derive the spectra (using the fitted polynomial) to enhance the signal quality and absorption features. The parameters are the polynomial order (<code>p</code>), the half-window size to sample and fit the spectra (<code>w</code>), the derivative order (<code>m</code>, where <code>m = 0</code> is used for smoothing and <code>m &gt; 1</code> are the respective derivatives), and the spacing interval (<code>delta.wav</code>). When we use the SG algorithm, the edges of the spectral range are reduced by one half-window size minus the center.</p>
-<p>Except for <code>delta.wav</code>, we can fine tune all of these parameters to find the best preprocessing combination, although several studies have already explore this in the literature and we can adopt what has been recommended. In this example, we are going to use the first-derivative of a second order polynomial regression with half-window size of 11 nm.</p>
+<p>Except for <code>delta.wav</code>, we can fine tune all of these parameters to find the best preprocessing combination, although several studies have already explored and we can adopt what has been recommended <span class="citation" data-cites="Dotto2018 Seybold2019 Barra2021">(<a href="references.html#ref-Dotto2018" role="doc-biblioref">Dotto et al. 2018</a>; <a href="references.html#ref-Seybold2019" role="doc-biblioref">Seybold et al. 2019</a>; <a href="references.html#ref-Barra2021" role="doc-biblioref">Barra et al. 2021</a>)</span>. In this example, we are going to use the first-derivative of a second order polynomial regression with half-window size of 11 nm.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select spectra columns</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse to matrix (input of prospectr::savitzkyGolay)</span></span>
@@ -570,12 +597,11 @@ Tip
 <span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(new.spectra.column.names)) <span class="sc">%&gt;%</span></span>
 <span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">savitzkyGolay</span>(<span class="at">X =</span> ., <span class="at">p =</span> <span class="dv">2</span>, <span class="at">w =</span> <span class="dv">11</span>, <span class="at">m =</span> <span class="dv">1</span>, <span class="at">delta.wav =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  as_tibble <span class="sc">%&gt;%</span></span>
-<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>({nir.spectra.rf <span class="sc">%&gt;%</span></span>
-<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(sample_id)}, .)</span>
-<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb41-15"><a href="#cb41-15" aria-hidden="true" tabindex="-1"></a>nir.spectra.sg[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>({nir.spectra.rf <span class="sc">%&gt;%</span></span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(sample_id)}, .)</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>nir.spectra.sg[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 5
   sample_id    `1360`      `1362`     `1364`      `1366`
@@ -587,7 +613,7 @@ Tip
 5         5 0.0000111 -0.00000283 -0.0000104 -0.0000139 </code></pre>
 </div>
 </div>
-<p>Moving-window first-derivatives are great because they preserve the orientation of the absorption features and enhance only the important regions of the spectra. For more complex spectra, however, this may hamper the interpretability.</p>
+<p>Moving-window first-derivatives are great because they preserve the orientation of the absorption features and enhance only the important regions of the spectra. For more complex spectra, however, this may hamper the interpretation.</p>
 <div class="callout-tip callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -598,7 +624,7 @@ Tip
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>dplyr</strong> allows us to use column selectors like <code>first()</code>, <code>everything()</code>, <code>all_of</code> etc. As we now have a shorter spectral range, rather than using <code>all_of(new.spectra.column.names)</code> we can replace it with <code>any_of(new.spectra.column.names)</code> to select any of the available columns within the predefined range of columns.</p>
+<p><strong>dplyr</strong> allows us to use column selectors like <code>first()</code>, <code>everything()</code>, <code>all_of</code> etc. As we now have a shorter spectral range, rather than using <code>all_of(new.spectra.column.names)</code> we can replace it with <code>any_of(new.spectra.column.names)</code> to select any of the available columns.</p>
 </div>
 </div>
 <div class="cell">
@@ -616,12 +642,161 @@ Tip
 <p><img src="processing_files/figure-html/sg_visualization-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>Another very common preprocessing is the Standard Normal Variate (SNV). SNV is a normalization algorithm (centers to mean 0 and rescales to 1 standard deviation) that works across the spectrum (row-wise). This preprocessing changes both the range of values and the amplitude of the curves and is intended to correct the scattering of light.</p>
+<p>SNV was originally proposed to deal with multiplicative effects of particle size, light scatter, and multicollinearity issues in diffuse reflectance spectroscopy <span class="citation" data-cites="Barnes1989">(<a href="references.html#ref-Barnes1989" role="doc-biblioref">Barnes, Dhanoa, and Lister 1989</a>)</span>. Although the first derivative has been routinely used in soil spectroscopy studies, SNV is in many cases preferred because it does not affect the interpretation of the spectral features.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select spectra columns</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse to matrix (input of prospectr::savitzkyGolay)</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Apply preprocessing</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Parse to tibble</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Bind the spectra to id column</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>nir.spectra.snv <span class="ot">&lt;-</span> nir.spectra.rf.int <span class="sc">%&gt;%</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(new.spectra.column.names)) <span class="sc">%&gt;%</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  prospectr<span class="sc">::</span><span class="fu">standardNormalVariate</span>(<span class="at">X =</span> .) <span class="sc">%&gt;%</span></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_cols</span>({nir.spectra.rf <span class="sc">%&gt;%</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(sample_id)}, .)</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>nir.spectra.sg[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 5
+  sample_id    `1360`      `1362`     `1364`      `1366`
+      &lt;dbl&gt;     &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;       &lt;dbl&gt;
+1         1 0.000112   0.000108    0.000101   0.0000887 
+2         2 0.000255   0.000236    0.000225   0.000223  
+3         3 0.000221   0.000212    0.000206   0.000201  
+4         4 0.000158   0.0000929   0.0000379 -0.00000238
+5         5 0.0000111 -0.00000283 -0.0000104 -0.0000139 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>nir.spectra.snv <span class="sc">%&gt;%</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">any_of</span>(new.spectra.column.names),</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">"wavelength"</span>,</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">"reflectance"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">wavelength =</span> <span class="fu">as.numeric</span>(wavelength),</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">reflectance =</span> <span class="fu">as.numeric</span>(reflectance)) <span class="sc">%&gt;%</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">data =</span> .) <span class="sc">+</span></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> wavelength, <span class="at">y =</span> reflectance, <span class="at">group =</span> sample_id),</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="processing_files/figure-html/snv_visualization-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 <section id="spectral-compression-and-projection" class="level2" data-number="2.6">
 <h2 data-number="2.6" class="anchored" data-anchor-id="spectral-compression-and-projection"><span class="header-section-number">2.6</span> Spectral compression and projection</h2>
-<p>New text.</p>
+<p>Another interesting operation that is routinely employed in soil spectroscopy is the compression and projection of the spectra into new coordinate systems.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://carpentries-incubator.github.io/high-dimensional-stats-r/fig/pendulum.gif" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">Source: carpentries-incubator.github.io</figcaption><p></p>
+</figure>
+</div>
+<p><strong>Partial Least Squares (PLS)</strong> and <strong>Principal Component Analysis (PCA)</strong> are popular orthogonal projection methods that helps to build regression models or explore the associations between spectra and variables of interest. Within this scope, orthogonalization means the production of uncorrelated features (predictors) such as the correlation between any pair of the new variables is 0 <span class="citation" data-cites="chang2001 deSantana2023">(<a href="references.html#ref-chang2001" role="doc-biblioref">Chang et al. 2001</a>; <a href="references.html#ref-deSantana2023" role="doc-biblioref">Santana et al. 2023</a>)</span>.</p>
+<p><strong>PLS</strong> is preferred if the goal is to find orthogonal features of the spectra that are more predictive of a soil property. On the other hand, if the goal is to find orthogonal features that maximally explain the variability of the spectra (irrespective of the variable of interest), then <strong>PCA</strong> can be adopted.</p>
+<p>Both methods have the advantages of producing uncorrelated features (control colinearity) and reduce the dimensionality of the original data. A few orthogonal features obtained from the spectra can be employed to replace the the original spectra matrix when training a model, with the downside of sacrificing some of the original spectral information.</p>
+<p>This opens doors for the optimization between the balance of retained representation and compression magnitude. Similarly, each spectral range must have its own compression and projection model, thus the orthogonal features of each spectral range account for different amounts of the total original variance.</p>
+<p>The values of the new uncorrelated features are usually named <code>scores</code>.</p>
+<p>We can use the package <strong>resemble</strong> to perform orthogonal projections of high dimensional data, i.e., spectra using either <strong>PCA</strong> and <strong>PLS</strong> with different optimization criteria.</p>
+<p>For this task, we will use the NIR Neospectra database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different device versions (serial number)</p>
+<p>We first filter the database and preprocess the spectra using <strong>SNV</strong>.</p>
+<section id="neospectra-preparation" class="level3" data-number="2.6.1">
+<h3 data-number="2.6.1" class="anchored" data-anchor-id="neospectra-preparation"><span class="header-section-number">2.6.1</span> Neospectra preparation</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Internet configuration for downloading big datasets</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">timeout =</span> <span class="dv">10000</span>)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a><span class="do">## Reading serialized files</span></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>neospectra.soil <span class="ot">&lt;-</span> <span class="fu">qread_url</span>(<span class="st">"https://storage.googleapis.com/soilspec4gg-public/neospectra_soillab_v1.2.qs"</span>)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(neospectra.soil)</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>neospectra.soil[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>neospectra.site <span class="ot">&lt;-</span> <span class="fu">qread_url</span>(<span class="st">"https://storage.googleapis.com/soilspec4gg-public/neospectra_soilsite_v1.2.qs"</span>)</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(neospectra.site)</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>neospectra.site[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>neospectra.nir <span class="ot">&lt;-</span> <span class="fu">qread_url</span>(<span class="st">"https://storage.googleapis.com/soilspec4gg-public/neospectra_nir_v1.2.qs"</span>)</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(neospectra.nir)</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>neospectra.nir[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Once we download this database, we can see that we have 2,106 unique soil samples and more than 8000 measurements. We need to explore it a little firther and take the average spectra across the different devices. We also select only relevant information for our Modeling section:</p>
+<ul>
+<li>Soil sample id: <code>id.sample_local_c</code>.<br>
+</li>
+<li>Origin country: <code>location.country_iso.3166_txt</code>.<br>
+</li>
+<li>Organic carbon content (%): <code>oc_usda.c729_w.pct.</code><br>
+</li>
+<li>Average NIR spectra: columns starting with <code>scan_nir</code>.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Column names</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>neospectra.site <span class="sc">%&gt;%</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>neospectra.soil <span class="sc">%&gt;%</span></span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>neospectra.nir <span class="sc">%&gt;%</span></span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a><span class="co"># How many distinct id.sample_local_c in the NIR file?</span></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>neospectra.nir <span class="sc">%&gt;%</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(id.sample_local_c) <span class="sc">%&gt;%</span></span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a><span class="co"># How many distinct countries and samples from?</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 2016 samples from USA, other from African countries</span></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>neospectra.site <span class="sc">%&gt;%</span></span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(location.country_iso<span class="fl">.3166</span>_txt)</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting relevant site data</span></span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>neospectra.site <span class="ot">&lt;-</span> neospectra.site <span class="sc">%&gt;%</span></span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id.sample_local_c, location.country_iso<span class="fl">.3166</span>_txt)</span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting relevant soil data</span></span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>neospectra.soil <span class="ot">&lt;-</span> neospectra.soil <span class="sc">%&gt;%</span></span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id.sample_local_c, oc_usda.c729_w.pct)</span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Selecting relevant NIR data and taking average across repeats</span></span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>neospectra.nir <span class="ot">&lt;-</span> neospectra.nir <span class="sc">%&gt;%</span></span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(id.sample_local_c, <span class="fu">starts_with</span>(<span class="st">"scan_nir"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id.sample_local_c) <span class="sc">%&gt;%</span></span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise_all</span>(mean, <span class="at">.group =</span> <span class="st">"drop"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Spectral visualization of a sample (n=100).</p>
+<p>Probability Density Function of Soil Organic Carbon.</p>
+<p>Standard Normal Variate.</p>
+</section>
+<section id="neospectra-compression" class="level3" data-number="2.6.2">
+<h3 data-number="2.6.2" class="anchored" data-anchor-id="neospectra-compression"><span class="header-section-number">2.6.2</span> Neospectra compression</h3>
 
 
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
+<div id="ref-Barnes1989" class="csl-entry" role="doc-biblioentry">
+Barnes, R. J., M. S. Dhanoa, and Susan J. Lister. 1989. <span>“Standard Normal Variate Transformation and de-Trending of Near-Infrared Diffuse Reflectance Spectra.”</span> <em>Applied Spectroscopy</em> 43 (5): 772–77. <a href="https://doi.org/10.1366/0003702894202201">https://doi.org/10.1366/0003702894202201</a>.
+</div>
+<div id="ref-Barra2021" class="csl-entry" role="doc-biblioentry">
+Barra, Issam, Stephan M. Haefele, Ruben Sakrabani, and Fassil Kebede. 2021. <span>“Soil Spectroscopy with the Use of Chemometrics, Machine Learning and Pre-Processing Techniques in Soil Diagnosis: Recent Advances<span></span>a Review.”</span> <em><span>TrAC</span> Trends in Analytical Chemistry</em> 135 (February): 116166. <a href="https://doi.org/10.1016/j.trac.2020.116166">https://doi.org/10.1016/j.trac.2020.116166</a>.
+</div>
+<div id="ref-chang2001" class="csl-entry" role="doc-biblioentry">
+Chang, Cheng-Wen, David Laird, Maurice J Mausbach, and Charles R Hurburgh Jr. 2001. <span>“Near-Infrared Reflectance Spectroscopy–Principal Components Regression Analyses of Soil Properties.”</span> <em>Soil Science Society of America Journal</em> 65 (2): 480. <a href="https://doi.org/10.2136/sssaj2001.652480x">https://doi.org/10.2136/sssaj2001.652480x</a>.
+</div>
+<div id="ref-Dotto2018" class="csl-entry" role="doc-biblioentry">
+Dotto, Andre Carnieletto, Ricardo Simao Diniz Dalmolin, Alexandre ten Caten, and Sabine Grunwald. 2018. <span>“A Systematic Study on the Application of Scatter-Corrective and Spectral-Derivative Preprocessing for Multivariate Prediction of Soil Organic Carbon by Vis-<span>NIR</span> Spectra.”</span> <em>Geoderma</em> 314 (March): 262–74. <a href="https://doi.org/10.1016/j.geoderma.2017.11.006">https://doi.org/10.1016/j.geoderma.2017.11.006</a>.
+</div>
+<div id="ref-deSantana2023" class="csl-entry" role="doc-biblioentry">
+Santana, Felipe B. de, Rebecca.L. Hall, Victoria Lowe, Margaret A. Browne, Eric C. Grunsky, Mairéad M. Fitzsimons, Vincent Gallagher, and Karen Daly. 2023. <span>“A Systematic Approach to Predicting and Mapping Soil Particle Size Distribution from Unknown Samples Using Large Mid-Infrared Spectral Libraries Covering Large-Scale Heterogeneous Areas.”</span> <em>Geoderma</em> 434 (June): 116491. <a href="https://doi.org/10.1016/j.geoderma.2023.116491">https://doi.org/10.1016/j.geoderma.2023.116491</a>.
+</div>
+<div id="ref-Seybold2019" class="csl-entry" role="doc-biblioentry">
+Seybold, Cathy A., Rich Ferguson, Doug Wysocki, Scarlett Bailey, Joe Anderson, Brian Nester, Phil Schoeneberger, et al. 2019. <span>“Application of Mid-Infrared Spectroscopy in Soil Survey.”</span> <em>Soil Science Society of America Journal</em> 83 (6): 1746–59. <a href="https://doi.org/10.2136/sssaj2019.06.0205">https://doi.org/10.2136/sssaj2019.06.0205</a>.
+</div>
+</div>
+</section>
 </section>
 
 </main> <!-- /main -->

@@ -4,13 +4,15 @@ In this section of the training workshop, we dive into the basic processing oper
 
 At the end, we will produce two files using a specific processing pipeline (`train.csv` and `test.csv`) that will be employed in the next Modeling section.
 
-It is important to mention that all files are being saved to a external working directory, i.e., we are not storing big files inside this GitHub repository.
+It is important to mention that all files are being saved to a external working directory, i.e., we are not storing big files inside this GitHub and book repository.
 
 You can set an external folder as your working directory and RStudio project, and copy/paste the code chunks of this session into plain R scripts.
 
 Please, set the working directory (or create an RStudio project) in your local machine:
 ```{r working_directory}
 my.wd <- "~/projects/temp/soilspec_training/"
+# Or within an RStudio project
+my.wd <- getwd()
 ```
 
 A list of all required packages for this section are provided the following code chunk. You will see that some specific/special functions are highlighted in the text by linking back the function with the original package using the `package::function()` syntax:
@@ -19,6 +21,8 @@ library("tidyverse")
 library("asdreader")
 library("opusreader2")
 library("prospectr")
+library("qs")
+library("resemble")
 ```
 
 ## Importing spectra
@@ -226,13 +230,13 @@ nir.spectra.rf.int %>%
 
 **prospectr** is a very useful package for signal processing and chemometrics as it contains various utilities for working with spectral data. As stated in the package vignette:
 
-> The aim of spectral [preprocessing] is to [enhance] signal quality before modeling as well as [to] remove physical information from the spectra. Applying a pre-treatment can increase the repeatability/reproducibility of the method, model robustness and accuracy, although there are no guarantees this will actually work.
+> The aim of spectral preprocessing is to enhance signal quality before modeling as well as to remove physical information from the spectra. Applying a pre-treatment can increase the repeatability/reproducibility of the method, model robustness and accuracy, although there are no guarantees this will actually work.
 
 There are several algorithms available through **prospectr** and elsewhere, e.g. listed in [Table 1](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#signal-processing) of its vignette. However, in this section we are going to showcase only a few that are more common: [Savitzky–Golay (SG) smoothing and derivatives](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#savitzky-golay-filtering), and [Standard Normal Variate (SNV)](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html#scatter-and-baseline-corrections).
 
 [Savitzky–Golay](https://en.wikipedia.org/wiki/Savitzky%E2%80%93Golay_filter) is an algorithm that fits a moving local polynomial regression that can smooth and/or derive the spectra (using the fitted polynomial) to enhance the signal quality and absorption features. The parameters are the polynomial order (`p`), the half-window size to sample and fit the spectra (`w`), the derivative order (`m`, where `m = 0` is used for smoothing and `m > 1` are the respective derivatives), and the spacing interval (`delta.wav`). When we use the SG algorithm, the edges of the spectral range are reduced by one half-window size minus the center.
 
-Except for `delta.wav`, we can fine tune all of these parameters to find the best preprocessing combination, although several studies have already explore this in the literature and we can adopt what has been recommended. In this example, we are going to use the first-derivative of a second order polynomial regression with half-window size of 11 nm.
+Except for `delta.wav`, we can fine tune all of these parameters to find the best preprocessing combination, although several studies have already explored and we can adopt what has been recommended [@Dotto2018; @Seybold2019; @Barra2021]. In this example, we are going to use the first-derivative of a second order polynomial regression with half-window size of 11 nm.
 
 ```{r sg}
 # Select spectra columns
@@ -244,18 +248,17 @@ nir.spectra.sg <- nir.spectra.rf.int %>%
   select(all_of(new.spectra.column.names)) %>%
   as.matrix() %>%
   savitzkyGolay(X = ., p = 2, w = 11, m = 1, delta.wav = 2) %>%
-  as_tibble %>%
   as_tibble() %>%
   bind_cols({nir.spectra.rf %>%
       select(sample_id)}, .)
 
 nir.spectra.sg[1:5,1:5]
 ```
-Moving-window first-derivatives are great because they preserve the orientation of the absorption features and enhance only the important regions of the spectra. For more complex spectra, however, this may hamper the interpretability.
+Moving-window first-derivatives are great because they preserve the orientation of the absorption features and enhance only the important regions of the spectra. For more complex spectra, however, this may hamper the interpretation.
 
 ::: {.callout-tip}
 ## Tip
-**dplyr** allows us to use column selectors like `first()`, `everything()`, `all_of` etc. As we now have a shorter spectral range, rather than using `all_of(new.spectra.column.names)` we can replace it with `any_of(new.spectra.column.names)` to select any of the available columns within the predefined range of columns.
+**dplyr** allows us to use column selectors like `first()`, `everything()`, `all_of` etc. As we now have a shorter spectral range, rather than using `all_of(new.spectra.column.names)` we can replace it with `any_of(new.spectra.column.names)` to select any of the available columns.
 :::
 
 ```{r sg_visualization}
@@ -270,10 +273,130 @@ nir.spectra.sg %>%
             alpha = 0.5, linewidth = 0.5) +
   theme_light()
 ```
+Another very common preprocessing is the Standard Normal Variate (SNV). SNV is a normalization algorithm (centers to mean 0 and rescales to 1 standard deviation) that works across the spectrum (row-wise). This preprocessing changes both the range of values and the amplitude of the curves and is intended to correct the scattering of light.
 
+SNV was originally proposed to deal with multiplicative effects of particle size, light scatter, and multicollinearity issues in diffuse reflectance spectroscopy [@Barnes1989]. Although the first derivative has been routinely used in soil spectroscopy studies, SNV is in many cases preferred because it does not affect the interpretation of the spectral features.
 
+```{r snv}
+# Select spectra columns
+# Parse to matrix (input of prospectr::savitzkyGolay)
+# Apply preprocessing
+# Parse to tibble
+# Bind the spectra to id column
+nir.spectra.snv <- nir.spectra.rf.int %>%
+  select(all_of(new.spectra.column.names)) %>%
+  as.matrix() %>%
+  prospectr::standardNormalVariate(X = .) %>%
+  as_tibble() %>%
+  bind_cols({nir.spectra.rf %>%
+      select(sample_id)}, .)
+
+nir.spectra.sg[1:5,1:5]
+```
+
+```{r snv_visualization}
+nir.spectra.snv %>%
+  pivot_longer(any_of(new.spectra.column.names),
+               names_to = "wavelength",
+               values_to = "reflectance") %>%
+  mutate(wavelength = as.numeric(wavelength),
+         reflectance = as.numeric(reflectance)) %>%
+  ggplot(data = .) +
+  geom_line(aes(x = wavelength, y = reflectance, group = sample_id),
+            alpha = 0.5, linewidth = 0.5) +
+  theme_light()
+```
 
 ## Spectral compression and projection
 
-New text.
+Another interesting operation that is routinely employed in soil spectroscopy is the compression and projection of the spectra into new coordinate systems.
 
+![Source: carpentries-incubator.github.io](https://carpentries-incubator.github.io/high-dimensional-stats-r/fig/pendulum.gif)
+
+**Partial Least Squares (PLS)** and **Principal Component Analysis (PCA)** are popular orthogonal projection methods that helps to build regression models or explore the associations between spectra and variables of interest. Within this scope, orthogonalization means the production of uncorrelated features (predictors) such as the correlation between any pair of the new variables is 0 [@chang2001; @deSantana2023].
+
+**PLS** is preferred if the goal is to find orthogonal features of the spectra that are more predictive of a soil property. On the other hand, if the goal is to find orthogonal features that maximally explain the variability of the spectra (irrespective of the variable of interest), then **PCA** can be adopted.
+
+Both methods have the advantages of producing uncorrelated features (control colinearity) and reduce the dimensionality of the original data. A few orthogonal features obtained from the spectra can be employed to replace the the original spectra matrix when training a model, with the downside of sacrificing some of the original spectral information.
+
+This opens doors for the optimization between the balance of retained representation and compression magnitude. Similarly, each spectral range must have its own compression and projection model, thus the orthogonal features of each spectral range account for different amounts of the total original variance.
+
+The values of the new uncorrelated features are usually named `scores`.
+
+We can use the package **resemble** to perform orthogonal projections of high dimensional data, i.e., spectra using either **PCA** and **PLS** with different optimization criteria.
+
+For this task, we will use the NIR Neospectra database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different device versions (serial number)
+
+We first filter the database and preprocess the spectra using **SNV**.
+
+### Neospectra preparation
+
+```{r import_neospectra, eval=FALSE}
+## Internet configuration for downloading big datasets
+options(timeout = 10000)
+
+## Reading serialized files
+neospectra.soil <- qread_url("https://storage.googleapis.com/soilspec4gg-public/neospectra_soillab_v1.2.qs")
+dim(neospectra.soil)
+neospectra.soil[1:5,1:5]
+
+neospectra.site <- qread_url("https://storage.googleapis.com/soilspec4gg-public/neospectra_soilsite_v1.2.qs")
+dim(neospectra.site)
+neospectra.site[1:5,1:5]
+
+neospectra.nir <- qread_url("https://storage.googleapis.com/soilspec4gg-public/neospectra_nir_v1.2.qs")
+dim(neospectra.nir)
+neospectra.nir[1:5,1:5]
+```
+
+Once we download this database, we can see that we have 2,106 unique soil samples and more than 8000 measurements. We need to explore it a little firther and take the average spectra across the different devices. We also select only relevant information for our Modeling section:
+
+- Soil sample id: `id.sample_local_c`.  
+- Origin country: `location.country_iso.3166_txt`.  
+- Organic carbon content (%): `oc_usda.c729_w.pct.`  
+- Average NIR spectra: columns starting with `scan_nir`.  
+
+```{r filter_neospectra, eval=FALSE}
+# Column names
+neospectra.site %>%
+  names()
+
+neospectra.soil %>%
+  names()
+
+neospectra.nir %>%
+  select(1:20) %>%
+  names()
+
+# How many distinct id.sample_local_c in the NIR file?
+neospectra.nir %>%
+  distinct(id.sample_local_c) %>%
+  nrow()
+
+# How many distinct countries and samples from?
+# 2016 samples from USA, other from African countries
+neospectra.site %>%
+  count(location.country_iso.3166_txt)
+
+# Selecting relevant site data
+neospectra.site <- neospectra.site %>%
+  select(id.sample_local_c, location.country_iso.3166_txt)
+
+# Selecting relevant soil data
+neospectra.soil <- neospectra.soil %>%
+  select(id.sample_local_c, oc_usda.c729_w.pct)
+
+# Selecting relevant NIR data and taking average across repeats
+neospectra.nir <- neospectra.nir %>%
+  select(id.sample_local_c, starts_with("scan_nir")) %>%
+  group_by(id.sample_local_c) %>%
+  summarise_all(mean, .group = "drop")
+```
+
+Spectral visualization of a sample (n=100).
+
+Probability Density Function of Soil Organic Carbon.
+
+Standard Normal Variate.
+
+### Neospectra compression
