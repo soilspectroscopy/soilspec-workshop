@@ -20,6 +20,69 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -126,7 +189,14 @@ ul.task-list li input[type="checkbox"] {
 </nav>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction-to-mlr3-framework" id="toc-introduction-to-mlr3-framework" class="nav-link active" data-scroll-target="#introduction-to-mlr3-framework"><span class="toc-section-number">3.1</span>  Introduction to mlr3 framework</a></li>
+  <li><a href="#inspecting-data-and-a-baseline-model" id="toc-inspecting-data-and-a-baseline-model" class="nav-link" data-scroll-target="#inspecting-data-and-a-baseline-model"><span class="toc-section-number">3.2</span>  Inspecting data and a baseline model</a></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/soilspectroscopy/soilspec-workshop/edit/main/modeling.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/soilspectroscopy/soilspec-workshop/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -148,10 +218,132 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<p>In this section, we introduce the modeling pipeline for working with spectroscopy data and estimating soil properties.</p>
-<p>More information will be added soon!</p>
+<p>In this section, we introduce the modeling pipeline for working with spectroscopy data and estimating soil properties. We will use the mlr3 modelling framework for modelling Soil Organic Carbon (SOC). We will train the predictive model trained on NIR spectra of US soil samples. We will test the model’s generalization on African soil samples.</p>
+<p>The mlr3 framework is well presented in Bischl, B., Sonabend, R., Kotthoff, L., &amp; Lang, M. (Eds.). (2024). “Applied Machine Learning Using mlr3 in R”. CRC Press. <a href="https://mlr3book.mlr-org.com"><strong>https://mlr3book.mlr-org.com</strong></a>.</p>
+<section id="introduction-to-mlr3-framework" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="introduction-to-mlr3-framework"><span class="header-section-number">3.1</span> Introduction to mlr3 framework</h2>
+<p>We will introduce novel principles of the mlr3 framework using the first chapter of the official <strong>mlr3 book</strong> <a href="https://mlr3book.mlr-org.com/chapters/chapter1/introduction_and_overview.html"><strong>(Kotthoff et al., 2024)</strong></a>.</p>
+<blockquote class="blockquote">
+<p>(…) The <strong>mlr3</strong> package and the wider mlr3 ecosystem provide a generic, object-oriented, and extensible framework for regression, classification, and other machine learning tasks for the R language. (…) We build on R6 for object orientation and data.table to store and operate on tabular data.</p>
+</blockquote>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://mlr3book.mlr-org.com/chapters/chapter1/Figures/mlr3_ecosystem.svg"><img src="./img/mlr3_ecosystem.svg" class="img-fluid figure-img"></a></p>
+<p></p><figcaption class="figure-caption">Figure 1: The mlr3 ecosystem</figcaption><p></p>
+</figure>
+</div>
+<p>The most convenient way how to load the whole enviroment is to load <code>mlr3verse</code> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("mlr3verse")</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("readr")</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"readr"</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"mlr3verse"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#loading train and test data</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>train_matrix <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/robertm/opengeohub/neospectra_workshop/train.csv"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>test_matrix <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"~/robertm/opengeohub/neospectra_workshop/test.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>What is R6?</strong></p>
+<blockquote class="blockquote">
+<p>(…) <a href="https://cran.r-project.org/web/packages/R6/index.html"><strong>R6</strong></a> is one of R’s more recent paradigms for object-oriented programming.</p>
+</blockquote>
+<p><strong>Objects</strong> are created by constructing an instance of an <a href="https://www.rdocumentation.org/packages/R6/versions/2.5.1/topics/R6Class"><strong>R6::R6Class</strong></a> variable using the <code>$new()</code> initialization method. For example, say we have used a mlr3 class <code>TaskRegr</code>, then <code>TaskRegr$new(id = "NIR_spectral", backend = train_matrix, target = "oc_usda.c729_w.pct")</code> would create a new object of class <code>TaskRegr</code> and sets the <code>id</code> , <code>backend</code>and <code>target</code> arguments of the constructor.</p>
+<p>Methods allow users to inspect the object’s state, retrieve information, or perform an action that changes the internal state of the object. For example<code>$set_col_roles()</code> method sets the special roles such as ID or blocking during resampling to the columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#creating an example object</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>example_object <span class="ot">=</span> TaskRegr<span class="sc">$</span><span class="fu">new</span>(<span class="at">id =</span> <span class="st">"NIR_spectral"</span>, </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">backend =</span> train_matrix, </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                              <span class="at">target =</span> <span class="st">"oc_usda.c729_w.pct"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>example_object<span class="sc">$</span>id</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "NIR_spectral"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">#calling methods of the object</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>example_object<span class="sc">$</span><span class="fu">set_col_roles</span>(<span class="st">"id.sample_local_c"</span>, <span class="at">role =</span> <span class="st">"name"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>example_object<span class="sc">$</span><span class="fu">set_col_roles</span>(<span class="st">"location.country_iso.3166_txt"</span>, <span class="at">role =</span> <span class="st">"group"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>example_object<span class="sc">$</span>col_roles</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$feature
+[1] "pc_1" "pc_2" "pc_3" "pc_4" "pc_5" "pc_6" "pc_7" "pc_8"
+
+$target
+[1] "oc_usda.c729_w.pct"
+
+$name
+[1] "id.sample_local_c"
+
+$order
+character(0)
+
+$stratum
+character(0)
+
+$group
+[1] "location.country_iso.3166_txt"
+
+$weight
+character(0)</code></pre>
+</div>
+</div>
+<p><strong>mlr3 Utilities</strong></p>
+<p>mlr3 uses convenience functions called <strong>helper functions or sugar functions</strong> to create most objects. For example <code>lrn("regr.rpart")</code> returns the decision tree learner without having to explicitly create a new R6 object.</p>
+<p>mlr3 uses <strong>dictionaries</strong> to store R6 classes. For example <code>lrn("regr.rpart")</code> is a wrapper around <code>mlr_learners$get("regr.rpart")</code>. You can see an overview of available learners by calling the sugar function without any arguments, i.e.&nbsp;<code>lrn()</code>.</p>
+</section>
+<section id="inspecting-data-and-a-baseline-model" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="inspecting-data-and-a-baseline-model"><span class="header-section-number">3.2</span> Inspecting data and a baseline model</h2>
+<p>Soil organic carbon (SOC) is a measurable component of soil organic matter. Organic matter makes up just a small part of soil’s mass and has an important role in the physical, chemical and biological function of agricultural soils. SOC is represented in percent units (0-100%) and have a highly right skewed probability distribution, because SOC makes up just 2-10% of most soil’s mass. The higher content is typical mainly for Organic soils i. e. peatbogs. Therefore SOC is oftenly modeled in a log-scale to penalize the higher SOC content that is minor part of the data. Let’s see if its is our case too.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(train_matrix<span class="sc">$</span>oc_usda.c729_w.pct, <span class="at">breaks =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="modeling_files/figure-html/histograms-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Yes, It is. So lets apply <code>log1p</code> function to SOC values of our train and test set. <code>log1p</code> function calculates natural logarithm of the number plus 1.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>train_matrix<span class="sc">$</span>oc_usda.c729_w.pct <span class="ot">=</span> <span class="fu">log1p</span>(train_matrix<span class="sc">$</span>oc_usda.c729_w.pct)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>test_matrix<span class="sc">$</span>oc_usda.c729_w.pct <span class="ot">=</span> <span class="fu">log1p</span>(test_matrix<span class="sc">$</span>oc_usda.c729_w.pct)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(train_matrix<span class="sc">$</span>oc_usda.c729_w.pct, <span class="at">breaks =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="modeling_files/figure-html/log1p-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It is a good practice to train a dummy model as a baseline to track the predictive power of our ML models. We will train the dummy model that always predicts new values to be the mean of the dataset. The dummy model is called <code>"regr.featureless"</code> in mlr3. But lets first create our ML task using mlr3 syntax to follow the logic of the framework.</p>
+<p>We will use the convenient method <code>as_task_regr()</code> to convert data object to a <code>TaskRegr</code> class. We need to use argument <code>target</code> and <code>id</code> at least to define target variable and task id.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">349</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create task</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>task_neospectra<span class="ot">=</span> <span class="fu">as_task_regr</span>(train_matrix[,<span class="sc">!</span><span class="fu">names</span>(train_matrix) <span class="sc">%in%</span> <span class="st">"location.country_iso.3166_txt"</span>], </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                              <span class="at">target =</span> <span class="st">"oc_usda.c729_w.pct"</span>, <span class="at">id =</span> <span class="st">"NIR_spectral"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>task_neospectra<span class="sc">$</span><span class="fu">set_col_roles</span>(<span class="st">"id.sample_local_c"</span>, <span class="at">roles =</span> <span class="st">"name"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>task_neospectra</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;TaskRegr:NIR_spectral&gt; (2016 x 9)
+* Target: oc_usda.c729_w.pct
+* Properties: -
+* Features (8):
+  - dbl (8): pc_1, pc_2, pc_3, pc_4, pc_5, pc_6, pc_7, pc_8</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="co"># load featureless learner</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">#featureless = always predicts new values to be the mean of the dataset</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>lrn_baseline <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"regr.featureless"</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#lrn_baseline$param_set</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">#only one hyperparameter: robust =  calculate mean if false / calculate median if true</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># train learners</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>lrn_baseline<span class="sc">$</span><span class="fu">train</span>(task_neospectra)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#predict on a new data</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>pred_baseline <span class="ot">=</span> lrn_baseline<span class="sc">$</span><span class="fu">predict_newdata</span>(test_matrix)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#evaluation on a new data</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">#define metrics</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>measures <span class="ot">=</span> <span class="fu">msrs</span>(<span class="fu">c</span>(<span class="st">"regr.rmse"</span>, <span class="st">"regr.rsq"</span>,<span class="st">"regr.mae"</span>, <span class="st">"time_both"</span>))</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>pred_baseline<span class="sc">$</span><span class="fu">score</span>(measures)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> regr.rmse   regr.rsq   regr.mae  time_both 
+ 0.5765752 -1.4082480  0.5268147  0.0000000 </code></pre>
+</div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

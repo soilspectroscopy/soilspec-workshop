@@ -1,5 +1,85 @@
 # Modeling
 
-In this section, we introduce the modeling pipeline for working with spectroscopy data and estimating soil properties.
+In this section, we introduce the modeling pipeline for working with spectroscopy data and estimating soil properties. We will use the mlr3 modelling framework for modelling Soil Organic Carbon (SOC). We will train the predictive model trained on NIR spectra of US soil samples. We will test the model's generalization on African soil samples.
 
-More information will be added soon!
+The mlr3 framework is well presented in Bischl, B., Sonabend, R., Kotthoff, L., & Lang, M. (Eds.). (2024). "Applied Machine Learning Using mlr3 in R". CRC Press. [**https://mlr3book.mlr-org.com**](https://mlr3book.mlr-org.com).
+
+## Introduction to mlr3 framework
+We will introduce novel principles of the mlr3 framework using the first chapter of the official **mlr3 book** [**(Kotthoff et al., 2024)**](https://mlr3book.mlr-org.com/chapters/chapter1/introduction_and_overview.html). 
+
+> (...) The **mlr3** package and the wider mlr3 ecosystem provide a generic, object-oriented, and extensible framework for regression, classification, and other machine learning tasks for the R language. (...) We build on R6 for object orientation and data.table to store and operate on tabular data. 
+
+[![Figure 1: The mlr3 ecosystem](./img/mlr3_ecosystem.svg)](https://mlr3book.mlr-org.com/chapters/chapter1/Figures/mlr3_ecosystem.svg)
+
+The most convenient way how to load the whole enviroment is to load `mlr3verse` package.
+```{r setup, message=FALSE, warning=FALSE}
+#install.packages("mlr3verse")
+#install.packages("readr")
+library("readr")
+library("mlr3verse")
+
+#loading train and test data
+train_matrix <- read_csv("~/robertm/opengeohub/neospectra_workshop/train.csv")
+test_matrix <- read_csv("~/robertm/opengeohub/neospectra_workshop/test.csv")
+```
+
+**What is R6?**
+
+> (...) [**R6**](https://cran.r-project.org/web/packages/R6/index.html) is one of R’s more recent paradigms for object-oriented programming.
+
+**Objects** are created by constructing an instance of an [**R6::R6Class**](https://www.rdocumentation.org/packages/R6/versions/2.5.1/topics/R6Class) variable using the `$new()` initialization method. For example, say we have used a mlr3 class `TaskRegr`, then `TaskRegr$new(id = "NIR_spectral", backend = train_matrix, target = "oc_usda.c729_w.pct")` would create a new object of class `TaskRegr` and sets the `id` , `backend `and `target` arguments of the constructor. 
+
+Methods  allow users to inspect the object’s state, retrieve information, or perform an action that changes the internal state of the object. For example`$set_col_roles()` method sets the special roles such as ID or blocking during resampling to the columns.
+
+```{r R6 object example, message=FALSE, warning=FALSE}
+#creating an example object
+example_object = TaskRegr$new(id = "NIR_spectral", 
+                              backend = train_matrix, 
+                              target = "oc_usda.c729_w.pct")
+example_object$id
+#calling methods of the object
+example_object$set_col_roles("id.sample_local_c", role = "name")
+example_object$set_col_roles("location.country_iso.3166_txt", role = "group")
+example_object$col_roles
+```
+**mlr3 Utilities**
+
+mlr3 uses convenience functions called **helper functions or sugar functions** to create most objects. For example `lrn("regr.rpart")` returns the decision tree learner without having to explicitly create a new R6 object.
+
+mlr3 uses **dictionaries** to store R6 classes.  For example `lrn("regr.rpart")` is a wrapper around `mlr_learners$get("regr.rpart")`. You can see an overview of available learners by calling the sugar function without any arguments, i.e. `lrn()`.
+
+## Inspecting data and a baseline model
+Soil organic carbon (SOC) is a measurable component of soil organic matter. Organic matter makes up just a small part of soil's mass and has an important role in the physical, chemical and biological function of agricultural soils. SOC is represented in percent units (0-100%) and have a highly right skewed probability distribution, because SOC makes up just 2-10% of most soil's mass. The higher content is typical mainly for Organic soils i. e. peatbogs. Therefore SOC is oftenly modeled in a log-scale  to penalize the higher SOC content that is minor part of the data. Let's see if its is our case too. 
+```{r histograms, message=FALSE, warning=FALSE}
+hist(train_matrix$oc_usda.c729_w.pct, breaks = 100)
+```
+Yes, It is. So lets apply `log1p` function to SOC values of our train and test set. `log1p` function calculates natural logarithm of the number plus 1. 
+```{r log1p, message=FALSE, warning=FALSE}
+train_matrix$oc_usda.c729_w.pct = log1p(train_matrix$oc_usda.c729_w.pct)
+test_matrix$oc_usda.c729_w.pct = log1p(test_matrix$oc_usda.c729_w.pct)
+hist(train_matrix$oc_usda.c729_w.pct, breaks = 100)
+```
+It is a good practice to train a dummy model as a baseline to track the predictive power of our ML models. We will train the dummy model that always predicts new values to be the mean of the dataset. The dummy model is called `"regr.featureless"` in mlr3. But lets first create our ML task using mlr3 syntax to follow the logic of the framework. 
+
+We will use the convenient method `as_task_regr()` to convert data object to a `TaskRegr` class. We need to use argument `target` and `id` at least to define target variable and task id. 
+```{r featureless baseline, message=FALSE, warning=FALSE}
+set.seed(349)
+  # create task
+task_neospectra= as_task_regr(train_matrix[,!names(train_matrix) %in% "location.country_iso.3166_txt"], 
+                              target = "oc_usda.c729_w.pct", id = "NIR_spectral")
+task_neospectra$set_col_roles("id.sample_local_c", roles = "name")
+task_neospectra
+  # load featureless learner
+    #featureless = always predicts new values to be the mean of the dataset
+lrn_baseline = lrn("regr.featureless")
+#lrn_baseline$param_set
+    #only one hyperparameter: robust =  calculate mean if false / calculate median if true
+  # train learners
+lrn_baseline$train(task_neospectra)
+  #predict on a new data
+pred_baseline = lrn_baseline$predict_newdata(test_matrix)
+  #evaluation on a new data
+    #define metrics
+measures = msrs(c("regr.rmse", "regr.rsq","regr.mae", "time_both"))
+pred_baseline$score(measures)
+```
