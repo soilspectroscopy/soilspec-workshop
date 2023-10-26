@@ -195,6 +195,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
   <li><a href="#introduction-to-mlr3-framework" id="toc-introduction-to-mlr3-framework" class="nav-link active" data-scroll-target="#introduction-to-mlr3-framework"><span class="toc-section-number">3.1</span>  Introduction to mlr3 framework</a></li>
   <li><a href="#inspecting-data-and-a-baseline-model" id="toc-inspecting-data-and-a-baseline-model" class="nav-link" data-scroll-target="#inspecting-data-and-a-baseline-model"><span class="toc-section-number">3.2</span>  Inspecting data and a baseline model</a></li>
+  <li><a href="#simple-benchmarking" id="toc-simple-benchmarking" class="nav-link" data-scroll-target="#simple-benchmarking"><span class="toc-section-number">3.3</span>  Simple benchmarking</a></li>
+  <li><a href="#simple-tuning" id="toc-simple-tuning" class="nav-link" data-scroll-target="#simple-tuning"><span class="toc-section-number">3.4</span>  Simple tuning</a></li>
+  <li><a href="#combining-benchmarking-and-tuning" id="toc-combining-benchmarking-and-tuning" class="nav-link" data-scroll-target="#combining-benchmarking-and-tuning"><span class="toc-section-number">3.5</span>  Combining benchmarking and tuning</a></li>
   </ul>
 <div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/soilspectroscopy/soilspec-workshop/edit/main/modeling.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/soilspectroscopy/soilspec-workshop/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
     </div>
@@ -218,8 +221,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>In this section, we introduce the modeling pipeline for working with spectroscopy data and estimating soil properties. We will use the mlr3 modelling framework for modelling Soil Organic Carbon (SOC). We will train the predictive model trained on NIR spectra of US soil samples. We will test the model’s generalization on African soil samples.</p>
+<p>In this section, we introduce the modeling pipeline for estimating soil properties using soil NIR data. We will use the mlr3 modelling framework for modelling Soil Organic Carbon (SOC). We will train the predictive model trained on NIR spectra of US soil samples. We will test the model’s generalization on African soil samples.</p>
 <p>The mlr3 framework is well presented in Bischl, B., Sonabend, R., Kotthoff, L., &amp; Lang, M. (Eds.). (2024). “Applied Machine Learning Using mlr3 in R”. CRC Press. <a href="https://mlr3book.mlr-org.com"><strong>https://mlr3book.mlr-org.com</strong></a>.</p>
+<p>You can find a lot of interesting video tutorials on machine learning in <a href="https://av.tib.eu/publisher/OpenGeoHub_Foundation">OpenGeoHub trining videos</a>.</p>
 <section id="introduction-to-mlr3-framework" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="introduction-to-mlr3-framework"><span class="header-section-number">3.1</span> Introduction to mlr3 framework</h2>
 <p>We will introduce novel principles of the mlr3 framework using the first chapter of the official <strong>mlr3 book</strong> <a href="https://mlr3book.mlr-org.com/chapters/chapter1/introduction_and_overview.html"><strong>(Kotthoff et al., 2024)</strong></a>.</p>
@@ -232,7 +236,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p></p><figcaption class="figure-caption">Figure 1: The mlr3 ecosystem</figcaption><p></p>
 </figure>
 </div>
-<p>The most convenient way how to load the whole enviroment is to load <code>mlr3verse</code> package.</p>
+<p>The most convenient way how to load the whole ecosystem is to load <code>mlr3verse</code> package.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("mlr3verse")</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#install.packages("readr")</span></span>
@@ -247,14 +251,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <blockquote class="blockquote">
 <p>(…) <a href="https://cran.r-project.org/web/packages/R6/index.html"><strong>R6</strong></a> is one of R’s more recent paradigms for object-oriented programming.</p>
 </blockquote>
-<p><strong>Objects</strong> are created by constructing an instance of an <a href="https://www.rdocumentation.org/packages/R6/versions/2.5.1/topics/R6Class"><strong>R6::R6Class</strong></a> variable using the <code>$new()</code> initialization method. For example, say we have used a mlr3 class <code>TaskRegr</code>, then <code>TaskRegr$new(id = "NIR_spectral", backend = train_matrix, target = "oc_usda.c729_w.pct")</code> would create a new object of class <code>TaskRegr</code> and sets the <code>id</code> , <code>backend</code>and <code>target</code> arguments of the constructor.</p>
+<p><strong>Objects</strong> are created by constructing an instance of an <a href="https://www.rdocumentation.org/packages/R6/versions/2.5.1/topics/R6Class"><strong>R6::R6Class</strong></a> variable using the <code>$new()</code> initialization method. For example, say we have used a mlr3 class <code>TaskRegr</code>, then <code>TaskRegr$new(id = "NIR_spectral", backend = train_matrix, target = "oc_usda.c729_w.pct")</code> would create a new object of class <code>TaskRegr</code> and sets the <code>id</code> , <code>backend</code>and <code>target</code> <strong>fields</strong> that encapsulates mutable state of the object.</p>
 <p>Methods allow users to inspect the object’s state, retrieve information, or perform an action that changes the internal state of the object. For example<code>$set_col_roles()</code> method sets the special roles such as ID or blocking during resampling to the columns.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#creating an example object</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>example_object <span class="ot">=</span> TaskRegr<span class="sc">$</span><span class="fu">new</span>(<span class="at">id =</span> <span class="st">"NIR_spectral"</span>, </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">backend =</span> train_matrix, </span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                              <span class="at">target =</span> <span class="st">"oc_usda.c729_w.pct"</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>example_object<span class="sc">$</span>id</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#access to the $id field</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>example_object<span class="sc">$</span>id</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "NIR_spectral"</code></pre>
 </div>
@@ -298,7 +303,7 @@ character(0)</code></pre>
 <p><img src="modeling_files/figure-html/histograms-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Yes, It is. So lets apply <code>log1p</code> function to SOC values of our train and test set. <code>log1p</code> function calculates natural logarithm of the number plus 1.</p>
+<p>Yes, It is. So lets apply <code>log1p</code> function to SOC values of our train and test set. <code>log1p</code> function calculates natural logarithm of the values plus 1.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>train_matrix<span class="sc">$</span>oc_usda.c729_w.pct <span class="ot">=</span> <span class="fu">log1p</span>(train_matrix<span class="sc">$</span>oc_usda.c729_w.pct)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>test_matrix<span class="sc">$</span>oc_usda.c729_w.pct <span class="ot">=</span> <span class="fu">log1p</span>(test_matrix<span class="sc">$</span>oc_usda.c729_w.pct)</span>
@@ -307,15 +312,16 @@ character(0)</code></pre>
 <p><img src="modeling_files/figure-html/log1p-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>It is a good practice to train a dummy model as a baseline to track the predictive power of our ML models. We will train the dummy model that always predicts new values to be the mean of the dataset. The dummy model is called <code>"regr.featureless"</code> in mlr3. But lets first create our ML task using mlr3 syntax to follow the logic of the framework.</p>
-<p>We will use the convenient method <code>as_task_regr()</code> to convert data object to a <code>TaskRegr</code> class. We need to use argument <code>target</code> and <code>id</code> at least to define target variable and task id.</p>
+<p>It is a good practice to train a dummy model as a baseline to track the predictive power increment of our ML models. But lets first create our ML task using mlr3 syntax to follow the logic of the framework.</p>
+<p>We will use the convenient method <code>as_task_regr()</code> to convert data object to a <code>TaskRegr</code> class. We need to set argument <code>target</code> specifying our target variable and <code>id</code> of the task. We will also set special role <code>"name"</code> (Row names/observation labels) to the <code>"id.sample_local_c"</code> column.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">349</span>)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># create task</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># create task</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>task_neospectra<span class="ot">=</span> <span class="fu">as_task_regr</span>(train_matrix[,<span class="sc">!</span><span class="fu">names</span>(train_matrix) <span class="sc">%in%</span> <span class="st">"location.country_iso.3166_txt"</span>], </span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                              <span class="at">target =</span> <span class="st">"oc_usda.c729_w.pct"</span>, <span class="at">id =</span> <span class="st">"NIR_spectral"</span>)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>task_neospectra<span class="sc">$</span><span class="fu">set_col_roles</span>(<span class="st">"id.sample_local_c"</span>, <span class="at">roles =</span> <span class="st">"name"</span>)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>task_neospectra</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="co">#set row names role to the id.sample_local_c column </span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>task_neospectra<span class="sc">$</span><span class="fu">set_col_roles</span>(<span class="st">"id.sample_local_c"</span>, <span class="at">roles =</span> <span class="st">"name"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>task_neospectra</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>&lt;TaskRegr:NIR_spectral&gt; (2016 x 9)
 * Target: oc_usda.c729_w.pct
@@ -323,22 +329,246 @@ character(0)</code></pre>
 * Features (8):
   - dbl (8): pc_1, pc_2, pc_3, pc_4, pc_5, pc_6, pc_7, pc_8</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>  <span class="co"># load featureless learner</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">#featureless = always predicts new values to be the mean of the dataset</span></span>
+</div>
+<p>We will train the dummy model that always predicts new values to be the mean of the dataset. The dummy model is called <code>"regr.featureless"</code> in mlr3 dictionary. We can call <code>lrn("regr.featureless")</code> to create <code>Learner</code> class R6 object with no explicit programming.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># load featureless learner</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="co">#featureless = always predicts new values to be the mean of the dataset</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>lrn_baseline <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"regr.featureless"</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co">#lrn_baseline$param_set</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">#only one hyperparameter: robust =  calculate mean if false / calculate median if true</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># train learners</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>lrn_baseline<span class="sc">$</span><span class="fu">train</span>(task_neospectra)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="co">#predict on a new data</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>pred_baseline <span class="ot">=</span> lrn_baseline<span class="sc">$</span><span class="fu">predict_newdata</span>(test_matrix)</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#evaluation on a new data</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">#define metrics</span></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>measures <span class="ot">=</span> <span class="fu">msrs</span>(<span class="fu">c</span>(<span class="st">"regr.rmse"</span>, <span class="st">"regr.rsq"</span>,<span class="st">"regr.mae"</span>, <span class="st">"time_both"</span>))</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>pred_baseline<span class="sc">$</span><span class="fu">score</span>(measures)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="co">#only one hyperparameter: robust =  calculate mean if false / calculate median if true</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co">#lrn_baseline$param_set</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># train learners using $train() method</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>lrn_baseline<span class="sc">$</span><span class="fu">train</span>(task_neospectra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We will calculate Root Mean Square Error (RMSE), Coefficient of determination (R2) and Mean absolute error (MAE) to assess the generalization error (prediction error, accuracy) of the model.</p>
+<blockquote class="blockquote">
+<p>(…) RMSE is calculated as a square root of the mean of the squared differences between predicted and expected target values in a dataset. The units of the RMSE are the same as the original units of the target value that is being predicted. RMSE of the perfect match is 0. (<a href="https://machinelearningmastery.com/regression-metrics-for-machine-learning/#:~:text=There%20are%20three%20error%20metrics,Mean%20Absolute%20Error%20(MAE)">Regression Metrics for Machine Learning</a>).</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>(…) R2, is the proportion of the variation in the dependent variable that is predictable from the independent variable(s). In the best case, the modeled values exactly match the observed values, which results in residual sum of squares 0 and R2 = 1. (<a href="https://en.wikipedia.org/wiki/Coefficient_of_determination">Coefficient of determination</a>). A baseline model, which always predicts mean, will have R2 &lt;= 0 when a non-linear function is used to fit the data (<a href="https://www.sciencedirect.com/science/article/abs/pii/S0304407696018180?via%3Dihub">Cameron &amp; Windmeijer, 1998</a>).</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>(…) The MAE score is calculated as the average of the absolute error values. Absolute or <code>abs()</code> is a mathematical function that simply makes a number positive. Therefore, the difference between an expected and predicted value may be positive or negative and is forced to be positive when calculating the MAE. Unlike the RMSE, the changes in MAE are linear and therefore intuitive. (<a href="https://machinelearningmastery.com/regression-metrics-for-machine-learning/#:~:text=There%20are%20three%20error%20metrics,Mean%20Absolute%20Error%20(MAE)">Regression Metrics for Machine Learning</a>).</p>
+</blockquote>
+<p>We will use <code>msrs</code> sugar function featuring mlr3 dictionary to create an object containing a list of class <code>Measures</code> objects <code>c("regr.rmse", "regr.rsq","regr.mae", "time_both")</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">349</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#define metrics</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>measures <span class="ot">=</span> <span class="fu">msrs</span>(<span class="fu">c</span>(<span class="st">"regr.rmse"</span>, <span class="st">"regr.rsq"</span>,<span class="st">"regr.mae"</span>, <span class="st">"time_both"</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#predict on a new data using $predict_newdata() method</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>pred_baseline <span class="ot">=</span> lrn_baseline<span class="sc">$</span><span class="fu">predict_newdata</span>(test_matrix)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#evaluation on the new data applying $score() method</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>pred_baseline<span class="sc">$</span><span class="fu">score</span>(measures)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> regr.rmse   regr.rsq   regr.mae  time_both 
  0.5765752 -1.4082480  0.5268147  0.0000000 </code></pre>
+</div>
+</div>
+</section>
+<section id="simple-benchmarking" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="simple-benchmarking"><span class="header-section-number">3.3</span> Simple benchmarking</h2>
+<p>We have the baseline for now. So we can start selection of the best performing ML model. How does one selects the best performing model for a specific task? One can compare estimated generalization error (accuracy) of the models using a Cross-Validation (CV) when benchmarking.</p>
+<p>Benchmarking is easy in mlr3 framework thanks to predefined object classes, sugar functions and dictionaries. One has to define the set of learners for benchmarking using <code>lrns()</code> sugar function and dictionary of the learners. Second step is to define <code>Resample</code> object that encapsulates the CV. We will use 10-fold CV for now.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>lrn_cv <span class="ot">=</span> <span class="fu">lrns</span>(<span class="fu">c</span>(<span class="st">"regr.ranger"</span>, <span class="st">"regr.cv_glmnet"</span>, <span class="st">"regr.cubist"</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>cv10 <span class="ot">=</span> <span class="fu">rsmp</span>(<span class="st">"cv"</span>, <span class="at">folds =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can pass the both objects to <code>benchmark_grid()</code> together with the task for constructing an exhaustive design to describe all combinations of the learners, tasks and resamplings to be used in a benchmark experiment. The benchmark experiment is conducted with <code>benchmark()</code>. The results are stored in the object of the <code>BenchmarkResult</code> class. One can access the results of benchmarking applying <code>$score()</code> or <code>$aggregate()</code> methods on the object. We can pass <code>Measures</code> object storing the selected metrics in the functions <a href="https://mlr3book.mlr-org.com/chapters/chapter3/evaluation_and_benchmarking.html#sec-benchmarking">Casalicchio &amp; Burk, 2024</a>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bench_cv_grid <span class="ot">=</span> <span class="fu">benchmark_grid</span>(task_neospectra, lrn_cv, cv10)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>bench_cv <span class="ot">=</span> <span class="fu">benchmark</span>(bench_cv_grid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co">#see the results of each iteration using $score()</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>bench_cv<span class="sc">$</span><span class="fu">score</span>(measures)[,.(learner_id, iteration, regr.rmse, regr.rsq, regr.mae, time_both)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        learner_id iteration regr.rmse  regr.rsq  regr.mae time_both
+ 1:    regr.ranger         1 0.3611061 0.6760205 0.2665764     1.286
+ 2:    regr.ranger         2 0.3021653 0.7014835 0.2359399     1.260
+ 3:    regr.ranger         3 0.3246370 0.6902694 0.2346659     1.397
+ 4:    regr.ranger         4 0.2889802 0.7102056 0.2206375     1.214
+ 5:    regr.ranger         5 0.2989487 0.6955167 0.2321681     1.280
+ 6:    regr.ranger         6 0.3076599 0.6573780 0.2302904     1.243
+ 7:    regr.ranger         7 0.3483764 0.6703322 0.2415052     1.447
+ 8:    regr.ranger         8 0.2882188 0.7388871 0.2213938     1.235
+ 9:    regr.ranger         9 0.3305036 0.6470012 0.2431240     1.286
+10:    regr.ranger        10 0.3196534 0.6625334 0.2441811     1.240
+11: regr.cv_glmnet         1 0.4051167 0.5922367 0.3148806     0.296
+12: regr.cv_glmnet         2 0.3385091 0.6253552 0.2622657     0.067
+13: regr.cv_glmnet         3 0.3778171 0.5804812 0.2670623     0.064
+14: regr.cv_glmnet         4 0.3261307 0.6309058 0.2601670     0.058
+15: regr.cv_glmnet         5 0.3500118 0.5826163 0.2891750     0.065
+16: regr.cv_glmnet         6 0.3436996 0.5724062 0.2577699     0.089
+17: regr.cv_glmnet         7 0.3914502 0.5837712 0.2851296     0.076
+18: regr.cv_glmnet         8 0.3541713 0.6057149 0.2796277     0.068
+19: regr.cv_glmnet         9 0.3619121 0.5767206 0.2754057     0.068
+20: regr.cv_glmnet        10 0.3576874 0.5774488 0.2813641     0.067
+21:    regr.cubist         1 0.3185123 0.7479421 0.2490038     0.142
+22:    regr.cubist         2 0.3132990 0.6790797 0.2435109     0.121
+23:    regr.cubist         3 0.3505592 0.6388306 0.2457150     0.137
+24:    regr.cubist         4 0.3086609 0.6693892 0.2300873     0.141
+25:    regr.cubist         5 0.3284882 0.6323710 0.2569309     0.185
+26:    regr.cubist         6 0.3810715 0.4743624 0.2632999     0.146
+27:    regr.cubist         7 0.3222047 0.7180041 0.2419510     0.127
+28:    regr.cubist         8 0.2952791 0.7259378 0.2247795     0.127
+29:    regr.cubist         9 0.3508014 0.6023112 0.2636218     0.139
+30:    regr.cubist        10 0.3258893 0.6492381 0.2511864     0.173
+        learner_id iteration regr.rmse  regr.rsq  regr.mae time_both</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co">#see the aggregated results of the models using $aggregate()</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>bench_cv<span class="sc">$</span><span class="fu">aggregate</span>(measures)[,.(learner_id, regr.rmse, regr.rsq, regr.mae)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       learner_id regr.rmse  regr.rsq  regr.mae
+1:    regr.ranger 0.3170250 0.6849627 0.2370482
+2: regr.cv_glmnet 0.3606506 0.5927657 0.2772848
+3:    regr.cubist 0.3294766 0.6537466 0.2470087</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">#using autoplot function to see RMSE boxplots</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co">#autoplot(bench_cv, measure = msr("regr.rmse"))</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># #predicting on test set using cubist model</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># lrn_cubist = lrn("regr.cubist")</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># lrn_cubist$train(task_neospectra)</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># pred_cubist = lrn_cubist$predict_newdata(test_matrix)</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="co"># pred_cubist$score(measures)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="simple-tuning" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="simple-tuning"><span class="header-section-number">3.4</span> Simple tuning</h2>
+<blockquote class="blockquote">
+<p>Machine learning algorithms usually include parameters and hyperparameters. Parameters are the model coefficients or weights or other information that are determined by the learning algorithm based on the training data. In contrast, hyperparameters, are configured by the user and determine how the model will fit its parameters, i.e., how the model is built The goal of hyperparameter optimization (HPO) or model tuning is to find the optimal configuration of hyperparameters of a machine learning algorithm for a given task. (…) <a href="https://mlr3book.mlr-org.com/chapters/chapter4/hyperparameter_optimization.html">Becker et al., 2024</a>.</p>
+</blockquote>
+<p>We will test simple model tuning of a <a href="https://cran.r-project.org/web/packages/Cubist/vignettes/cubist.html">cubist model</a>. We will search randomly for the best pair of <code>comitees</code> (a boosting-like scheme where iterative model trees are created in sequence) and <code>neighbors</code> (how many similar training points to use for determining the average of these training set points) hyperparameters.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#define search spaces for committees and neighbors inside the Learner object using to_tune function</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>lrn_cubist <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"regr.cubist"</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">committees =</span> <span class="fu">to_tune</span>(<span class="dv">1</span>, <span class="dv">20</span>),</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">neighbors =</span> <span class="fu">to_tune</span>(<span class="dv">0</span>, <span class="dv">5</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                 )</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co">#define tuning instance using tune() helper function</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="co">#tune() function will automatically calls $optimize() method of the instance</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>simple_tune <span class="ot">=</span> <span class="fu">tune</span>(</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">"random_search"</span>, <span class="co">#picking random combinations of hyperparameters from the search space</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">task =</span> task_neospectra,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">learner =</span> lrn_cubist,</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">resampling =</span> cv10, <span class="co">#apply 10-fold CV to calculate an evaluation metrics</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">measures =</span> <span class="fu">msr</span>(<span class="st">"regr.rmse"</span>), <span class="co"># use rmse metrics to select the best set of hyperparameters</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">term_evals =</span> <span class="dv">10</span> <span class="co">#terminate tuning after testing 10 combinations</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#exploring tuning results</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>simple_tune<span class="sc">$</span>result</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   committees neighbors learner_param_vals  x_domain regr.rmse
+1:         18         5          &lt;list[2]&gt; &lt;list[2]&gt;  0.292324</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># #create a new instance of the cubist model</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># lrn_cubist_tuned = lrn("regr.cubist")</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># #set best performing hyperparameters to the new instance</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># lrn_cubist_tuned$param_set$values = simple_tune$result_learner_param_vals</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># #train</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="co"># lrn_cubist_tuned$train(task_neospectra)</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># #predict and evaluate</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="co"># pred_cubist_tuned = lrn_cubist_tuned$predict_newdata(test_matrix)</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># pred_cubist_tuned$score(measures)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="combining-benchmarking-and-tuning" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="combining-benchmarking-and-tuning"><span class="header-section-number">3.5</span> Combining benchmarking and tuning</h2>
+<p>It is a standard to combine tuning and benchmarking, i. e. to benchmark tuned models, while searching for the best task specific model. <strong>However, It is a good practice to implement nested resampling to get a really robust estimates of the generalization error.</strong> It means to implement inner CV for tuning models and the outer CV to benchmark tuned models. We can implement it easily in mlr3 framework using the previous code and handy functions of mlr3 framework such as <strong>predefined tuning spaces</strong> and paraller processing.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">#showing dictionary of available pre-trained tuning spaces</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">as.data.table</span>(mlr_tuning_spaces)[, .(label)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                                           label
+ 1:   Default GLM with Elastic Net Regularization Classification
+ 2: RandomBot GLM with Elastic Net Regularization Classification
+ 3:                    Default k-Nearest-Neighbor Classification
+ 4:                  RandomBot k-Nearest-Neighbor Classification
+ 5:                                Default Ranger Classification
+ 6:                              RandomBot Ranger Classification
+ 7:                                  Default Classification Tree
+ 8:                                RandomBot Classification Tree
+ 9:                Default Support Vector Machine Classification
+10:              RandomBot Support Vector Machine Classification
+11:             Default Extreme Gradient Boosting Classification
+12:           RandomBot Extreme Gradient Boosting Classification
+13:       Default GLM with Elastic Net Regularization Regression
+14:     RandomBot GLM with Elastic Net Regularization Regression
+15:                        Default k-Nearest-Neighbor Regression
+16:                      RandomBot k-Nearest-Neighbor Regression
+17:                                    Default Ranger Regression
+18:                                  RandomBot Ranger Regression
+19:                                      Default Regression Tree
+20:                                    RandomBot Regression Tree
+21:                    Default Support Vector Machine Regression
+22:                  RandomBot Support Vector Machine Regression
+23:                 Default Extreme Gradient Boosting Regression
+24:               RandomBot Extreme Gradient Boosting Regression
+                                                           label</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#selecting the spaces using sugar function ltss()</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>spaces <span class="ot">=</span> <span class="fu">ltss</span>(<span class="fu">c</span>(<span class="st">"regr.ranger.default"</span>, <span class="st">"regr.glmnet.default"</span>)) <span class="co">#no availabe space for cubist</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co">#creating list of learners and an empty list to write tuned learners</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>lrn_cv <span class="ot">=</span> <span class="fu">lrns</span>(<span class="fu">c</span>(<span class="st">"regr.ranger"</span>, <span class="st">"regr.glmnet"</span>))</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>lrn_cv_tuned <span class="ot">=</span> <span class="fu">list</span>()</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="co">#for loop to tune hyperparameters of every learner using random search</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(lrn_cv)) {</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="co">#using multiple cores for tuning each model</span></span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">"multisession"</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  instance <span class="ot">=</span> <span class="fu">tune</span>(</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">task =</span> task_neospectra,</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">method =</span> <span class="st">"random_search"</span>,</span>
+<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">learner =</span> lrn_cv[[i]],</span>
+<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">resampling =</span> cv10,</span>
+<span id="cb26-17"><a href="#cb26-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">measures =</span> <span class="fu">msr</span>(<span class="st">"regr.rmse"</span>),</span>
+<span id="cb26-18"><a href="#cb26-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">term_evals =</span> <span class="dv">10</span>,</span>
+<span id="cb26-19"><a href="#cb26-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">search_space =</span> spaces[[i]]</span>
+<span id="cb26-20"><a href="#cb26-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb26-21"><a href="#cb26-21" aria-hidden="true" tabindex="-1"></a>  <span class="co">#writing tuned huperparameters</span></span>
+<span id="cb26-22"><a href="#cb26-22" aria-hidden="true" tabindex="-1"></a>  lrn_cv_tuned[[i]] <span class="ot">=</span> lrn_cv[[i]]</span>
+<span id="cb26-23"><a href="#cb26-23" aria-hidden="true" tabindex="-1"></a>  lrn_cv_tuned[[i]]<span class="sc">$</span>param_set<span class="sc">$</span>values <span class="ot">=</span> instance<span class="sc">$</span>result_learner_param_vals</span>
+<span id="cb26-24"><a href="#cb26-24" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb26-25"><a href="#cb26-25" aria-hidden="true" tabindex="-1"></a><span class="co">#adding previously tuned cubist model to the list for benchmarking</span></span>
+<span id="cb26-26"><a href="#cb26-26" aria-hidden="true" tabindex="-1"></a>  <span class="co">#create a new instance of the cubist model</span></span>
+<span id="cb26-27"><a href="#cb26-27" aria-hidden="true" tabindex="-1"></a>lrn_cubist_tuned <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"regr.cubist"</span>)</span>
+<span id="cb26-28"><a href="#cb26-28" aria-hidden="true" tabindex="-1"></a>  <span class="co">#set best performing hyperparameters to the new instance</span></span>
+<span id="cb26-29"><a href="#cb26-29" aria-hidden="true" tabindex="-1"></a>lrn_cubist_tuned<span class="sc">$</span>param_set<span class="sc">$</span>values <span class="ot">=</span> simple_tune<span class="sc">$</span>result_learner_param_vals</span>
+<span id="cb26-30"><a href="#cb26-30" aria-hidden="true" tabindex="-1"></a>lrn_cv_tuned <span class="ot">=</span> <span class="fu">c</span>(lrn_cv_tuned, lrn_cubist_tuned)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co">#creating benchmark grid</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>bench_cv_grid <span class="ot">=</span> <span class="fu">benchmark_grid</span>(task_neospectra, lrn_cv_tuned, cv10)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="co">#implementing bechmarking using multiple cores</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">"multisession"</span>)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  bench_cv <span class="ot">=</span> <span class="fu">benchmark</span>(bench_cv_grid)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#bench_cv$score(measures)[,.(learner_id, regr.rmse, regr.rsq, regr.mae)]</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>bench_cv<span class="sc">$</span><span class="fu">aggregate</span>(measures)[,.(learner_id, regr.rmse, regr.rsq, regr.mae)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    learner_id regr.rmse  regr.rsq  regr.mae
+1: regr.ranger 0.3154700 0.6857807 0.2337789
+2: regr.glmnet 0.3532080 0.6054299 0.2717692
+3: regr.cubist 0.2939111 0.7267064 0.2114755</code></pre>
+</div>
+</div>
+<p>We can see that the cubist model works best. So lets test the tuned cubist model on the test set. We can get the real generalization error of the best performing model by training a new model instance on the whole dataset and calculating error metrics on the test set.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>lrn_cubist_tuned <span class="ot">=</span> <span class="fu">lrn</span>(<span class="st">"regr.cubist"</span>)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>lrn_cubist_tuned<span class="sc">$</span>param_set<span class="sc">$</span>values <span class="ot">=</span> lrn_cv_tuned[[<span class="dv">3</span>]]<span class="sc">$</span>param_set<span class="sc">$</span>values</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>lrn_cubist_tuned<span class="sc">$</span><span class="fu">train</span>(task_neospectra)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>pred_cubist_tuned <span class="ot">=</span> lrn_cubist_tuned<span class="sc">$</span><span class="fu">predict_newdata</span>(test_matrix)</span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>pred_cubist_tuned<span class="sc">$</span><span class="fu">score</span>(measures)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>regr.rmse  regr.rsq  regr.mae time_both 
+0.2433321 0.5710685 0.1910893 0.0000000 </code></pre>
 </div>
 </div>
 
