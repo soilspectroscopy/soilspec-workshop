@@ -127,14 +127,6 @@ bench_cv = benchmark(bench_cv_grid)
 bench_cv$score(measures)[,.(learner_id, iteration, regr.rmse, regr.rsq, regr.mae, time_both)]
 #see the aggregated results of the models using $aggregate()
 bench_cv$aggregate(measures)[,.(learner_id, regr.rmse, regr.rsq, regr.mae)]
-#using autoplot function to see RMSE boxplots
-#autoplot(bench_cv, measure = msr("regr.rmse"))
-
-# #predicting on test set using cubist model
-# lrn_cubist = lrn("regr.cubist")
-# lrn_cubist$train(task_neospectra)
-# pred_cubist = lrn_cubist$predict_newdata(test_matrix)
-# pred_cubist$score(measures)
 ```
 
 
@@ -163,16 +155,6 @@ simple_tune = tune(
 ```{r tune cubist model results, message=FALSE, warning=FALSE}
 #exploring tuning results
 simple_tune$result
-
-# #create a new instance of the cubist model
-# lrn_cubist_tuned = lrn("regr.cubist")
-# #set best performing hyperparameters to the new instance
-# lrn_cubist_tuned$param_set$values = simple_tune$result_learner_param_vals
-# #train
-# lrn_cubist_tuned$train(task_neospectra)
-# #predict and evaluate
-# pred_cubist_tuned = lrn_cubist_tuned$predict_newdata(test_matrix)
-# pred_cubist_tuned$score(measures)
 ```
 
 ## Combining benchmarking and tuning
