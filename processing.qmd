@@ -2,7 +2,7 @@
 
 In this section of the training workshop, we dive into the basic processing operations of soil spectroscopy data. This includes importing spectral data, making tabular and element-wise operations, visualization, resampling, preprocessing, and compression.
 
-At the end, we will produce two files using a specific processing pipeline (`train.csv` and `test.csv`) that will be employed in the next Modeling section.
+At the end, we will produce two files using a specific processing pipeline (`train.csv` and `test.csv`) that will be employed in the next [Modeling](#sec-modeling) section.
 
 It is important to mention that all files are being saved to an external working directory, i.e., we are not storing big files inside this GitHub and book repository.
 
@@ -308,9 +308,9 @@ nir.spectra.snv %>%
   theme_light()
 ```
 
-## Preparing Modeling dataset
+## Preparing modeling dataset
 
-For the Modeling task and compression/projection, we will use the NIR Neospectra Handheld database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different devices (identified by serial number).
+For the [Modeling](#sec-modeling) task and compression/projection, we will use the NIR Neospectra Handheld database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different devices (identified by serial number).
 
 We will prepare a case-study dataset using several operations that include reading, filtering, preprocessing with **SNV**, and compressing the spectra with **PCA** to predict Soil Organic Carbon (SOC).
 
@@ -434,44 +434,6 @@ neospectra.nir.snv %>%
   theme_light()
 ```
 
-**Probability Density Function of Soil Organic Carbon content.**
-
-```{r neospectra_oc, eval=TRUE}
-# PDF plot
-ggplot(neospectra.soil) +
-  geom_density(aes(x = oc_usda.c729_w.pct)) +
-  theme_light()
-
-# Skewness
-neospectra.soil %>%
-  pull(oc_usda.c729_w.pct) %>%
-  skewness(na.rm = T)
-
-# Kurtosis
-neospectra.soil %>%
-  pull(oc_usda.c729_w.pct) %>%
-  kurtosis(na.rm = T)
-
-# What happens when we log1p?
-
-# Skewness
-neospectra.soil %>%
-  pull(oc_usda.c729_w.pct) %>%
-  log1p(.) %>%
-  skewness(na.rm = T)
-
-# Kurtosis
-neospectra.soil %>%
-  pull(oc_usda.c729_w.pct) %>%
-  log1p(.) %>%
-  kurtosis(na.rm = T)
-
-# PDF after log1p
-ggplot(neospectra.soil) +
-  geom_density(aes(x = log1p(oc_usda.c729_w.pct))) +
-  theme_light()
-```
-
 **Joining data and spliting for train/test**
 
 ```{r neospectra_join, eval=TRUE}
@@ -587,5 +549,141 @@ write_csv(train.pca.scores, paste0(my.wd, "train.csv"))
 write_csv(test.pca.scores, paste0(my.wd, "test.csv"))
 ```
 
+## Representation flag
 
+We can leverage the PCA and any other compression algorithms to identify identify unrepresentative spectra in predicting unknown samples.
 
+As only the first most important components are used for calibration, the remaining farther components can be used to test if a new sample is underrepresented in respect of the feature space of the calibration set. This underrepresentation flag might happen due to unique spectral features that are still present in farther components.
+
+In chemometrics, this is usually named as Control Chart. A good overview of this task can be found in @deSantana2023.
+
+In this task, each new spectrum to be predicted is back-transformed using only the first retained PCs of the model calibration. With the back-transformed version, the residual (difference between the original and back-transformed spectra) is employed to calculate the Q-statistics. The result is therefore compared against a critical value estimated across the calibration setting a predefined confidence interval (e.g., 99%).
+
+```{r backtransform, message=FALSE, error=FALSE}
+# Getting the necessary parameters for backtransformation
+train.loadings <- train.pca$X_loadings
+train.center <- train.pca$center
+train.scale <- train.pca$scale
+
+# Getting scores
+train.scores <- predict(train.pca,
+                       newdata = {
+                         neospectra.train %>%
+                           select(all_of(spectral.column.names)) %>%
+                           as.matrix()})
+
+test.scores <- predict(train.pca,
+                       newdata = {
+                         neospectra.test %>%
+                           select(all_of(spectral.column.names)) %>%
+                           as.matrix()})
+
+# Backtransforming
+train.bt <- train.scores %*% train.loadings
+test.bt <- test.scores %*% train.loadings
+
+# Rescaling
+train.bt <- sweep(x = train.bt,
+                  MARGIN = 2, FUN = "*", STATS = train.scale)
+
+test.bt <- sweep(x = test.bt,
+                 MARGIN = 2, FUN = "*", STATS = train.scale)
+
+# Recentering
+train.bt <- sweep(x = train.bt,
+                  MARGIN = 2, FUN = "+", STATS = train.center)
+
+test.bt <- sweep(x = test.bt,
+                 MARGIN = 2, FUN = "+", STATS = train.center)
+
+# Binding id columns
+train.bt <- as_tibble(train.bt) %>%
+  bind_cols({neospectra.train %>%
+      select(-all_of(spectral.column.names))}, .)
+
+test.bt <- as_tibble(test.bt) %>%
+  bind_cols({neospectra.test %>%
+      select(-all_of(spectral.column.names))}, .)
+
+# Quick visualization
+selected.id <- "65140"
+
+plot.data <- bind_rows(
+  {neospectra.test %>%
+      filter(id.sample_local_c == selected.id) %>%
+      mutate(source = "original", .before = 1)},
+  {test.bt %>%
+      filter(id.sample_local_c == selected.id) %>%
+      mutate(source = "compressed", .before = 1)})
+
+plot.data %>%
+  pivot_longer(any_of(spectral.column.names),
+               names_to = "wavelength",
+               values_to = "reflectance") %>%
+  mutate(wavelength = as.numeric(wavelength),
+         reflectance = as.numeric(reflectance)) %>%
+  ggplot(data = .) +
+  geom_line(aes(x = wavelength, y = reflectance,
+                group = source, color = source),
+            alpha = 0.5, linewidth = 1) +
+  theme_light() + theme(legend.position = "bottom")
+```
+
+We can see there are some subtle mismatch between the original and back-transformed spectra, and depending on the importance of those underrepresented features in the calibration models, the new spectra might not be properly compressed and yield unsatisfactory prediction. We use this approach to flag potential outliers or underrepresented samples before model prediction.
+
+With the original and backtransformed spectra, we can subtract each other and calculate the Q-statistics (sum of squared differences)
+```{r q_stats, message=FALSE, error=FALSE}
+neospectra.train.spectra <- neospectra.train %>%
+  arrange(id.sample_local_c) %>%
+  select(all_of(spectral.column.names)) %>%
+  as.matrix()
+
+train.bt.spectra <- train.bt %>%
+  arrange(id.sample_local_c) %>%
+  select(all_of(spectral.column.names)) %>%
+  as.matrix()
+
+neospectra.test.spectra <- neospectra.test %>%
+  arrange(id.sample_local_c) %>%
+  select(all_of(spectral.column.names)) %>%
+  as.matrix()
+
+test.bt.spectra <- test.bt %>%
+  arrange(id.sample_local_c) %>%
+  select(all_of(spectral.column.names)) %>%
+  as.matrix()
+
+# Q stats - sum of squared differences - only for test
+test.q.stats <- apply((neospectra.test.spectra-test.bt.spectra)^2,
+                       MARGIN = 1, sum)
+
+# Binding q.stats to compressed data
+test.pca.scores <- test.pca.scores %>%
+  mutate(q_stats = test.q.stats, .before = pc_1)
+```
+
+The critical value (1% significance level) comes from the training set (used for calibration) using the equation provided in @Jackson1979, @Laursen2011, and @deSantana2023.
+
+```{r q_critical, message=FALSE, error=FALSE}
+E <- cov(neospectra.train.spectra-train.bt.spectra)
+teta1 <- sum(diag(E))^1
+teta2 <- sum(diag(E))^2
+teta3 <- sum(diag(E))^3
+h0 <- 1-((2*teta1*teta3)/(3*teta2^2))
+Ca <- 2.57 # 1% significance level
+Qa <- teta1*(1-(teta2*h0*((1-h0)/teta1^2))+((sqrt(Ca*(2*teta2*h0^2)))/teta1))^(1/h0)
+Qa
+```
+
+Now we can compare the test samples with this critical value and flag them in the PCA plot.
+
+```{r q_flag, message=FALSE, error=FALSE}
+test.pca.scores <- test.pca.scores %>%
+  mutate(represented = ifelse(q_stats <= Qa, TRUE, FALSE), .after = q_stats)
+
+p.pca +
+  geom_point(data = test.pca.scores,
+             aes(x = pc_1, y = pc_2, fill = represented),
+             shape = 21, size = 1.5) +
+  labs(fill = "Represented?")
+```
