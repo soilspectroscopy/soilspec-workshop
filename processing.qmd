@@ -10,10 +10,10 @@ You can set an external folder as your working directory and RStudio project, an
 
 Please, set the working directory (or create an RStudio project) in your local machine:
 ```{r working_directory}
-#my.wd <- "~/projects/temp/soilspec_training/"
-my.wd = "~/robertm/opengeohub/neospectra_workshop/"
+my.wd <- "~/projects/temp/soilspec_training/"
+# my.wd = "~/robertm/opengeohub/neospectra_workshop/"
 # Or within an RStudio project
-#my.wd <- getwd()
+# my.wd <- getwd()
 ```
 
 A list of all required packages for this section is provided in the following code chunk. You will see that some specific/special functions are highlighted in the text by linking back the function with the original package using the `package::function()` syntax:
