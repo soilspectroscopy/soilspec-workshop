@@ -3,10 +3,10 @@ project:
   output-dir: docs
 
 book:
-  title: "Training workshop on soil spectroscopy"
+  title: "Predictive Soil Spectroscopy"
   page-footer:
     left: |
-      This booklet was written by Jose L. Safanelli, Robert Minarik,
+      This handout was written by Jose L. Safanelli, Robert Minarik,
       Jonathan Sanderman, and Tomislav Hengl.
     right: |
       This book was built with <a href="https://quarto.org/">Quarto</a>.

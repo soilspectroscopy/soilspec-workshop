@@ -1,6 +1,6 @@
 # Welcome! {.unnumbered}
 
-Welcome to our training workshop on soil spectroscopy! This is in-person event that is being held in St Louis, MO, at the tri-societies meeting 2023.
+Welcome to our training workshop on **Predictive Soil Spectroscopy**! This is an in-person event which is being held in St Louis, MO, at the [**ACS international meeting 2023**](https://www.acsmeetings.org/).
 
 Soil spectroscopy, specifically [**Diffuse Reflectance Infrared (DRIFT) spectroscopy**](https://en.wikipedia.org/wiki/Diffuse_reflectance_infrared_Fourier_transform_spectroscopy), is rapidly becoming a common tool for soil scientists in academia and in industry.
 
@@ -24,7 +24,7 @@ If you are interested in getting started in R using tidy packages and principles
 - Learning how to set a basic project on RStudio is neatly described in [**Workflow: projects**](https://r4ds.had.co.nz/workflow-projects.html).  
 - We are going to have several demonstrations of data [**import**](https://r4ds.had.co.nz/data-import.html) and [**wrangling**](https://r4ds.had.co.nz/transform.html#transform) by piped operations, and plot visualizations with [**ggplot**](https://r4ds.had.co.nz/data-visualisation.html).  
 
-Other spectral operations, like importing raw files, preprocessing, compression, and modeling will be done with dedicated libraries, e.g., [**asdreader**](https://github.com/pierreroudier/asdreader), [**opusreader2**](https://spectral-cockpit.github.io/opusreader2/), [**prospectr**](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html), [**pls**](https://cran.r-project.org/web/packages/pls/vignettes/pls-manual.pdf), [**resemble**](https://cran.r-project.org/web/packages/resemble/vignettes/resemble.html), and others.
+Other spectral operations, like importing raw files, preprocessing, compression, and modeling will be done with dedicated libraries, e.g., [**asdreader**](https://github.com/pierreroudier/asdreader), [**opusreader2**](https://spectral-cockpit.github.io/opusreader2/), [**prospectr**](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html), [**resemble**](https://cran.r-project.org/web/packages/resemble/vignettes/resemble.html), [**mlr3**](https://mlr3book.mlr-org.com/), and others.
 
 # Recommended literature {.unnumbered}
 
@@ -53,5 +53,9 @@ This website/book and attached software is free to use, and is licensed under th
 # Acknowledgments {.unnumbered}
 
 [**Soil Spectroscopy for Global Good**](https://soilspectroscopy.org/) is organized by [**Woodwell Climate Research Center**](https://www.woodwellclimate.org/), [**University of Florida**](https://faculty.eng.ufl.edu/ktoddbrown/), and [**OpenGeoHub foundation**](https://opengeohub.org/). This project has been funded by the USDA National Institute of Food and Agriculture [award #2020-67021-32467](https://cris.nifa.usda.gov/cgi-bin/starfinder/0?path=fastlink1.txt&id=anon&pass=&search=R=89483&format=WEBFMT6NT).
+
+# Citing
+
+José Lucas Safanelli, Robert Minarik, Jonathan Sanderman, Tomislav Hengl. Predictive Soil Spectroscopy. 2023. Available on: <https://soilspectroscopy.github.io/soilspec-workshop/>.
 
 ![](img/cover.png){fig-align="center" width="50%"}

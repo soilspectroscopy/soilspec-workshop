@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Training workshop on soil spectroscopy - 3&nbsp; Modeling</title>
+<title>Predictive Soil Spectroscopy - 3&nbsp; Modeling</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -165,7 +165,7 @@ div.csl-indent {
   <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">Training workshop on soil spectroscopy</a> 
+      <a href="./">Predictive Soil Spectroscopy</a> 
         <div class="sidebar-tools-main">
     <a href="https://github.com/soilspectroscopy/soilspec-workshop/" title="Source Code" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
 </div>
@@ -944,15 +944,15 @@ Ratio of Performance to the Interquartile Range (RPIQ)
 <div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Final output</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>final.outputs <span class="ot">&lt;-</span> accuracy.data <span class="sc">%&gt;%</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">error =</span> pred_cubist_error<span class="sc">$</span>response) <span class="sc">%&gt;%</span></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">CI95 =</span> error<span class="sc">*</span>alpha_0<span class="fl">.95</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lower_CI =</span> predicted<span class="sc">-</span>CI95,</span>
-<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">upper_CI =</span> predicted<span class="sc">+</span>CI95) <span class="sc">%&gt;%</span></span>
-<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>error, <span class="sc">-</span>CI95)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PI95 =</span> error<span class="sc">*</span>alpha_0<span class="fl">.95</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">lower_PI =</span> predicted<span class="sc">-</span>PI95,</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">upper_PI =</span> predicted<span class="sc">+</span>PI95) <span class="sc">%&gt;%</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>error, <span class="sc">-</span>PI95)</span>
 <span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>final.outputs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 90 × 5
-       id observed predicted lower_CI upper_CI
+       id observed predicted lower_PI upper_PI
     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
  1 263200   0.993      0.294   0.207     0.380
  2 263201   0.788      0.642   0.394     0.890
@@ -970,13 +970,13 @@ Ratio of Performance to the Interquartile Range (RPIQ)
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>final.outputs <span class="ot">&lt;-</span> final.outputs <span class="sc">%&gt;%</span></span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">observed =</span> <span class="fu">expm1</span>(observed),</span>
 <span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">predicted =</span> <span class="fu">expm1</span>(predicted),</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">lower_CI =</span> <span class="fu">expm1</span>(lower_CI),</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">upper_CI =</span> <span class="fu">expm1</span>(upper_CI))</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">lower_PI =</span> <span class="fu">expm1</span>(lower_PI),</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">upper_PI =</span> <span class="fu">expm1</span>(upper_PI))</span>
 <span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>final.outputs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 90 × 5
-       id observed predicted lower_CI upper_CI
+       id observed predicted lower_PI upper_PI
     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
  1 263200      1.7     0.342   0.230     0.463
  2 263201      1.2     0.901   0.483     1.44 
@@ -992,7 +992,7 @@ Ratio of Performance to the Interquartile Range (RPIQ)
 </div>
 <div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculating coverage statistics</span></span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>final.outputs <span class="ot">&lt;-</span> final.outputs <span class="sc">%&gt;%</span></span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">covered =</span> <span class="fu">ifelse</span>(observed <span class="sc">&gt;=</span> lower_CI <span class="sc">&amp;</span> observed <span class="sc">&lt;=</span> upper_CI, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">covered =</span> <span class="fu">ifelse</span>(observed <span class="sc">&gt;=</span> lower_PI <span class="sc">&amp;</span> observed <span class="sc">&lt;=</span> upper_PI, <span class="cn">TRUE</span>, <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout-note callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -1004,7 +1004,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>We don’t match 95% probably because of the violation of the <strong>Exchangeability</strong> assumption. This might have happened because the test set does not come from the same geographical region and original spectral library, but conformal prediction method still does a good job (approximates to 80%) for deriving the uncertainty band. We need to use additional criteria do decide about the final predictions.</p>
+<p>We don’t match 95% prediction interval (PI95%) probably because of the violation of the <a href="https://en.wikipedia.org/wiki/Conformal_prediction#Theory"><strong>Exchangeability</strong> assumption</a>. This might have happened because the test set does not come from the same geographical region and original spectral library, but conformal prediction method still does a good job (approximates to 80%) for deriving the uncertainty band. We need to use additional criteria do decide about the final predictions.</p>
 </div>
 </div>
 <div class="cell">
@@ -1039,17 +1039,17 @@ Note
 <div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Final accuracy plot</span></span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>perfomance.annotation <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"Rsq = "</span>, <span class="fu">round</span>(final.accuracy[[<span class="dv">1</span>,<span class="st">"rsq"</span>]], <span class="dv">3</span>),</span>
 <span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"</span><span class="sc">\n</span><span class="st">RMSE = "</span>, <span class="fu">round</span>(final.accuracy[[<span class="dv">1</span>,<span class="st">"rmse"</span>]], <span class="dv">3</span>),</span>
-<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"</span><span class="sc">\n</span><span class="st">Coverage CI95% = "</span>, <span class="fu">round</span>(final.accuracy[[<span class="dv">1</span>,<span class="st">"coverage"</span>]], <span class="dv">3</span>), <span class="st">"%"</span>)</span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a>                                <span class="st">"</span><span class="sc">\n</span><span class="st">Coverage PI95% = "</span>, <span class="fu">round</span>(final.accuracy[[<span class="dv">1</span>,<span class="st">"coverage"</span>]], <span class="dv">3</span>), <span class="st">"%"</span>)</span>
 <span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>p.final <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(final.outputs) <span class="sc">+</span></span>
 <span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_pointrange</span>(<span class="fu">aes</span>(<span class="at">x =</span> observed, <span class="at">y =</span> predicted,</span>
-<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">ymin =</span> lower_CI, <span class="at">ymax =</span> upper_CI,</span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">ymin =</span> lower_PI, <span class="at">ymax =</span> upper_PI,</span>
 <span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">color =</span> covered)) <span class="sc">+</span></span>
 <span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_abline</span>(<span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">slope =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">-</span><span class="cn">Inf</span>, <span class="at">y =</span> <span class="cn">Inf</span>, <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.1</span>, <span class="at">vjust =</span> <span class="fl">1.2</span>),</span>
 <span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">label =</span> perfomance.annotation) <span class="sc">+</span></span>
 <span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Soil Organic Carbon (%) test prediction"</span>,</span>
-<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Observed"</span>, <span class="at">y =</span> <span class="st">"Predicted"</span>, <span class="at">color =</span> <span class="st">"CI95% covered:"</span>) <span class="sc">+</span></span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Observed"</span>, <span class="at">y =</span> <span class="st">"Predicted"</span>, <span class="at">color =</span> <span class="st">"PI95% covered:"</span>) <span class="sc">+</span></span>
 <span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
 <span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Making sure it we have a square plot</span></span>
@@ -1238,7 +1238,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">This booklet was written by Jose L. Safanelli, Robert Minarik, Jonathan Sanderman, and Tomislav Hengl.</div>   
+    <div class="nav-footer-left">This handout was written by Jose L. Safanelli, Robert Minarik, Jonathan Sanderman, and Tomislav Hengl.</div>   
     <div class="nav-footer-right">This book was built with <a href="https://quarto.org/">Quarto</a>.</div>
   </div>
 </footer>

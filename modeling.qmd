@@ -448,10 +448,10 @@ pred_cubist_error
 # Final output
 final.outputs <- accuracy.data %>%
   mutate(error = pred_cubist_error$response) %>%
-  mutate(CI95 = error*alpha_0.95) %>%
-  mutate(lower_CI = predicted-CI95,
-         upper_CI = predicted+CI95) %>%
-  select(-error, -CI95)
+  mutate(PI95 = error*alpha_0.95) %>%
+  mutate(lower_PI = predicted-PI95,
+         upper_PI = predicted+PI95) %>%
+  select(-error, -PI95)
 
 final.outputs
 
@@ -459,18 +459,18 @@ final.outputs
 final.outputs <- final.outputs %>%
   mutate(observed = expm1(observed),
          predicted = expm1(predicted),
-         lower_CI = expm1(lower_CI),
-         upper_CI = expm1(upper_CI))
+         lower_PI = expm1(lower_PI),
+         upper_PI = expm1(upper_PI))
 
 final.outputs
 
 # Calculating coverage statistics
 final.outputs <- final.outputs %>%
-  mutate(covered = ifelse(observed >= lower_CI & observed <= upper_CI, TRUE, FALSE))
+  mutate(covered = ifelse(observed >= lower_PI & observed <= upper_PI, TRUE, FALSE))
 ```
 
 ::: {.callout-note}
-We don't match 95% probably because of the violation of the **Exchangeability** assumption. This might have happened because the test set does not come from the same geographical region and original spectral library, but conformal prediction method still does a good job (approximates to 80%) for deriving the uncertainty band. We need to use additional criteria do decide about the final predictions.
+We don't match 95% prediction interval (PI95%) probably because of the violation of the [**Exchangeability** assumption](https://en.wikipedia.org/wiki/Conformal_prediction#Theory). This might have happened because the test set does not come from the same geographical region and original spectral library, but conformal prediction method still does a good job (approximates to 80%) for deriving the uncertainty band. We need to use additional criteria do decide about the final predictions.
 :::
 
 ```{r final_outputs, message=FALSE, warning=FALSE}
@@ -494,17 +494,17 @@ final.accuracy
 # Final accuracy plot
 perfomance.annotation <- paste0("Rsq = ", round(final.accuracy[[1,"rsq"]], 3),
                                 "\nRMSE = ", round(final.accuracy[[1,"rmse"]], 3),
-                                "\nCoverage CI95% = ", round(final.accuracy[[1,"coverage"]], 3), "%")
+                                "\nCoverage PI95% = ", round(final.accuracy[[1,"coverage"]], 3), "%")
 
 p.final <- ggplot(final.outputs) +
   geom_pointrange(aes(x = observed, y = predicted,
-                      ymin = lower_CI, ymax = upper_CI,
+                      ymin = lower_PI, ymax = upper_PI,
                       color = covered)) +
   geom_abline(intercept = 0, slope = 1) +
   geom_text(aes(x = -Inf, y = Inf, hjust = -0.1, vjust = 1.2),
                 label = perfomance.annotation) +
   labs(title = "Soil Organic Carbon (%) test prediction",
-       x = "Observed", y = "Predicted", color = "CI95% covered:") +
+       x = "Observed", y = "Predicted", color = "PI95% covered:") +
   theme_light() + theme(legend.position = "bottom")
 
 # Making sure it we have a square plot
