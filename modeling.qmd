@@ -15,12 +15,20 @@ library("ranger") # Random Forest ML algorithm
 library("glmnet") # Elastic net ML Algorithm
 library("future") # Parallel processing
 library("yardstick")
+library("mlr3extralearners")
+```
+
+Except for **mlr3extralearners**, you can install all the above packages using `install.packages()`. In this case, follow the intructions on [**mlr3extralearners** GitHub repository](https://github.com/mlr-org/mlr3extralearners):
+
+```{r, eval=FALSE}
+# latest GitHub release
+remotes::install_github("mlr-org/mlr3extralearners@*release")
 ```
 
 Please, set the working directory (or load an RStudio project) in your local machine:
 ```{r working_directory}
-my.wd <- "~/projects/temp/soilspec_training/"
-# my.wd = "~/robertm/opengeohub/neospectra_workshop/"
+my.wd <- "~/projects/temp/soilspec_training"
+# my.wd = "~/robertm/opengeohub/neospectra_workshop"
 # Or within an RStudio project
 # my.wd <- getwd()
 ```
@@ -43,8 +51,8 @@ library("mlr3verse")
 library("tidyverse")
 
 # Loading train and test data
-train_matrix <- read_csv(paste0(my.wd, "train.csv"))
-test_matrix <- read_csv(paste0(my.wd, "test.csv"))
+train_matrix <- read_csv(file.path(my.wd, "train.csv"))
+test_matrix <- read_csv(file.path(my.wd, "test.csv"))
 ```
 
 **What is R6?**
