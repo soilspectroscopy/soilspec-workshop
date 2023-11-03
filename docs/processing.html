@@ -250,8 +250,8 @@ div.csl-indent {
 <p>You can set an external folder as your working directory and RStudio project, and copy/paste the code chunks of this session into plain R scripts.</p>
 <p>Please, set the working directory (or create an RStudio project) in your local machine:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my.wd <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training/"</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># my.wd = "~/robertm/opengeohub/neospectra_workshop/"</span></span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my.wd <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training"</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># my.wd = "~/robertm/opengeohub/neospectra_workshop"</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Or within an RStudio project</span></span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># my.wd &lt;- getwd()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -274,7 +274,7 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an .asd file</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>visnir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/101453MD01.asd"</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>visnir.spectra.path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(my.wd, <span class="st">"file1.asd"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>visnir.spectra.path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(my.wd, <span class="st">"file1.asd"</span>)</span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> visnir.spectra.url,</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> visnir.spectra.path,</span>
@@ -312,7 +312,7 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an .0 file</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>mir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/235157XS01.0"</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>mir.spectra.path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(my.wd, <span class="st">"file2.0"</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>mir.spectra.path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(my.wd, <span class="st">"file2.0"</span>)</span>
 <span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> mir.spectra.url,</span>
 <span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> mir.spectra.path,</span>
@@ -361,7 +361,7 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading an csv output from Neospectra</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>nir.spectra.url <span class="ot">&lt;-</span> <span class="st">"https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/sample_neospectra_data.csv"</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>nir.spectra.path <span class="ot">&lt;-</span> <span class="fu">paste0</span>(my.wd, <span class="st">"file3.csv"</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>nir.spectra.path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(my.wd, <span class="st">"file3.csv"</span>)</span>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="fu">download.file</span>(<span class="at">url =</span> nir.spectra.url,</span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">destfile =</span> nir.spectra.path,</span>
@@ -441,7 +441,7 @@ div.csl-indent {
 </section>
 <section id="visualization" class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="visualization"><span class="header-section-number">2.3</span> Visualization</h2>
-<p>Another important operation is to to be able to visualize the spectra. For this task, we can use the *ggplot2** package after pivoting the [wide] table to a long version that stores the data in two new columns: wavelength (<code>x</code> variable) and reflectance (<code>y</code> variable).</p>
+<p>Another important operation is to to be able to visualize the spectra. For this task, we can use the <strong>ggplot2</strong> package after pivoting the [wide] table to a long version that stores the data in two new columns: wavelength (<code>x</code> variable) and reflectance (<code>y</code> variable).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Pivot to long format</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>nir.spectra.rf.long <span class="ot">&lt;-</span> nir.spectra.rf <span class="sc">%&gt;%</span></span>
@@ -1083,14 +1083,14 @@ cumulative_explained_var 9.771387e-01 9.846573e-01 9.887432e-01 9.919853e-01</co
 <p><strong>Saving files</strong></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving the PCA plot</span></span>
-<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">paste0</span>(my.wd, <span class="st">"plot_pca_train_test.png"</span>), p.pca.test,</span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggsave</span>(<span class="fu">file.path</span>(my.wd, <span class="st">"plot_pca_train_test.png"</span>), p.pca.test,</span>
 <span id="cb86-3"><a href="#cb86-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">dpi =</span> <span class="dv">300</span>, <span class="at">width =</span> <span class="dv">4</span>, <span class="at">height =</span> <span class="dv">3</span>, <span class="at">units =</span> <span class="st">"in"</span>, <span class="at">scale =</span> <span class="fl">1.5</span>)</span>
 <span id="cb86-4"><a href="#cb86-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb86-5"><a href="#cb86-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving the train set</span></span>
-<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(train.pca.scores, <span class="fu">paste0</span>(my.wd, <span class="st">"train.csv"</span>))</span>
+<span id="cb86-6"><a href="#cb86-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(train.pca.scores, <span class="fu">file.path</span>(my.wd, <span class="st">"train.csv"</span>))</span>
 <span id="cb86-7"><a href="#cb86-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb86-8"><a href="#cb86-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving the test set</span></span>
-<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(test.pca.scores, <span class="fu">paste0</span>(my.wd, <span class="st">"test.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb86-9"><a href="#cb86-9" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(test.pca.scores, <span class="fu">file.path</span>(my.wd, <span class="st">"test.csv"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="representation-flag" class="level2" data-number="2.8">

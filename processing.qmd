@@ -10,8 +10,8 @@ You can set an external folder as your working directory and RStudio project, an
 
 Please, set the working directory (or create an RStudio project) in your local machine:
 ```{r working_directory}
-my.wd <- "~/projects/temp/soilspec_training/"
-# my.wd = "~/robertm/opengeohub/neospectra_workshop/"
+my.wd <- "~/projects/temp/soilspec_training"
+# my.wd = "~/robertm/opengeohub/neospectra_workshop"
 # Or within an RStudio project
 # my.wd <- getwd()
 ```
@@ -39,7 +39,7 @@ A common raw format for `VisNIR` measurements is the `.asd`. This format is used
 # Downloading an .asd file
 visnir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/101453MD01.asd"
 
-visnir.spectra.path <- paste0(my.wd, "file1.asd")
+visnir.spectra.path <- file.path(my.wd, "file1.asd")
 
 download.file(url = visnir.spectra.url,
               destfile = visnir.spectra.path,
@@ -67,7 +67,7 @@ As the `OPUS` format is proprietary, [spectra-cockipit.space](https://spectral-c
 # Downloading an .0 file
 mir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/235157XS01.0"
 
-mir.spectra.path <- paste0(my.wd, "file2.0")
+mir.spectra.path <- file.path(my.wd, "file2.0")
 
 download.file(url = mir.spectra.url,
               destfile = mir.spectra.path,
@@ -94,7 +94,7 @@ In many cases, instead of importing the raw binary files, we can directly import
 # Downloading an csv output from Neospectra
 nir.spectra.url <- "https://github.com/soilspectroscopy/ossl-models/raw/main/sample-data/sample_neospectra_data.csv"
 
-nir.spectra.path <- paste0(my.wd, "file3.csv")
+nir.spectra.path <- file.path(my.wd, "file3.csv")
 
 download.file(url = nir.spectra.url,
               destfile = nir.spectra.path,
@@ -141,7 +141,7 @@ We can also use the same element-wise operations to transform data in absorbance
 
 ## Visualization
 
-Another important operation is to to be able to visualize the spectra. For this task, we can use the *ggplot2** package after pivoting the [wide] table to a long version that stores the data in two new columns: wavelength (`x` variable) and reflectance (`y` variable).
+Another important operation is to to be able to visualize the spectra. For this task, we can use the **ggplot2** package after pivoting the [wide] table to a long version that stores the data in two new columns: wavelength (`x` variable) and reflectance (`y` variable).
 
 ```{r visualization}
 ## Pivot to long format
@@ -539,14 +539,14 @@ p.pca.test <- p.pca +
 
 ```{r save, eval=TRUE}
 # Saving the PCA plot
-ggsave(paste0(my.wd, "plot_pca_train_test.png"), p.pca.test,
+ggsave(file.path(my.wd, "plot_pca_train_test.png"), p.pca.test,
        dpi = 300, width = 4, height = 3, units = "in", scale = 1.5)
 
 # Saving the train set
-write_csv(train.pca.scores, paste0(my.wd, "train.csv"))
+write_csv(train.pca.scores, file.path(my.wd, "train.csv"))
 
 # Saving the test set
-write_csv(test.pca.scores, paste0(my.wd, "test.csv"))
+write_csv(test.pca.scores, file.path(my.wd, "test.csv"))
 ```
 
 ## Representation flag
