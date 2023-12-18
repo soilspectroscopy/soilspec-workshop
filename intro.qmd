@@ -1,3 +1,91 @@
 # Introduction
 
-This is a section that gives an overview about predictive soil spectroscopy.
+**Predictive soil spectroscopy (PSS)** is a technique that explores the interaction of electromagnetic radiation with soil to estimate soil properties. PSS is a powerful tool for soil science and management, as it can provide rapid, cost-effective, and non-destructive measurements of soil attributes. However, PSS also poses some challenges and requires careful consideration of several factors, such as:
+
+- **Fit for purpose**: the choice of PSS method and spectral range should match the specific objective and context of the study or application.  
+- **Good predictions flow from good data**: the quality and representativeness of the reference [soil spectral library (SSL)](https://www.woodwellclimate.org/open-soil-spectral-library/) and the soil analytical methods are crucial for the accuracy and reliability of the PSS predictions.  
+- **Good practices for model building**: the selection and evaluation of the appropriate multivariate calibration or machine learning algorithm and the validation and interpretation of the PSS models are essential for the robustness and usefulness of the PSS results.  
+
+To apply PSS, we need to use a reference SSL, which is a collection of soil spectra and corresponding soil properties measured by conventional methods. The SSL serves as the training data set for building and testing the PSS models. The performance of the PSS models depends largely on how well the SSL covers the variability and diversity of the soil samples that we want to predict. Therefore, we have two options: we can either create a new SSL that is tailored to our specific goal and soil samples, or we can use an existing public SSL that is sufficiently representative of our soil samples, such as the [**USDA NRCS Kellog Soil Spectral Library**](https://ncsslabdatamart.sc.egov.usda.gov/) or the [**Open Soil Spectral Library**](https://soilspectroscopy.github.io/ossl-manual/), which contains the KSSL and many other global datasets.
+
+## Fit for purpose
+
+Soil spectroscopy is a fit-for-purpose technology, which means that the predictive solution must be tailored to a specific goal and context. Using soil spectroscopy without considering its suitability and applicability for a given project may lead to unsatisfactory results. Therefore, it is helpful to ask some questions before designing and implementing a soil spectroscopy project, such as:
+
+::: {.callout-tip}
+## Tip
+By answering these questions, one can assess the feasibility and suitability of soil spectroscopy for a specific project and make informed decisions about the best practices and methods to use.
+:::
+
+| Question | Answer |
+|:-----|------:|
+| **What soil properties will be predicted?** | Some soil properties are easier to predict with soil spectroscopy than others, depending on the association of spectral features with the soil property of interest. For example, soil organic carbon has a strong correlation with spectral reflectance, while extractable nutrients have a weaker correlation |
+| **What accuracy/precision is required for the project?** | The accuracy and precision of soil spectroscopy estimates depend on the quality and representativeness of the calibration data, the spectral region and resolution, and the statistical method used. Soil spectroscopy may not be suitable for projects that require very high precision, such as controlled replicated field trials. However, it may be adequate for projects that aim to classify soils into distinct classes or values, or to estimate the mean value of many samples, such as soil surveys. |
+| **What is the budget for the project?** | Soil spectroscopy can reduce the cost of soil analysis significantly compared to traditional methods, especially when dealing with large numbers of samples. However, the cost of soil spectroscopy also varies depending on the type and quality of the instrument used. Research-grade bench-top laboratory spectrometers may cost hundreds of thousands of dollars, while lower-cost portable [FTIR](https://en.wikipedia.org/wiki/Fourier-transform_infrared_spectroscopy) may cost dozens of thousands of dollars. Additionally, the cost of soil spectroscopy may include other expenses, such as sample preparation, data processing, and calibration development and validation. |
+| **What instrumentation is available or accessible for the project?** | The choice of instrument for soil spectroscopy depends on the spectral region, resolution, and range that are needed for the project. Different instruments have different advantages and disadvantages in terms of performance, portability, and usability. For example, VisNIR instruments are more accessible and easier to use than MIR instruments, but they may have lower predictive accuracy and precision for some soil properties. |
+
+### Example 1: Cover crop impacts on soil carbon in Iowa
+
+Cover crops are plants that are grown to improve soil health and reduce erosion. They can also affect soil organic carbon (SOC) stocks, which are important for mitigating climate change and enhancing soil fertility. However, measuring SOC stocks is time-consuming and expensive, especially at large scales. Therefore, we use soil spectroscopy to assess the impacts of cover crops on SOC stocks across 20 commercial farms in Iowa.
+
+We design our study as follows:
+
+- **Requirement**: We need an unbiased estimate of field-level (~20 ha) mean SOC stocks, as well as soil texture and pH, for each farm.  
+- **Study design**: We collect 1 soil core per hectare at 3 depths (0-10 cm, 10-20 cm, and 20-30 cm) for each farm, and we divide the farms into two treatments: with cover crops and without cover crops. This results in 2400 soil samples in total.  
+- **Methodology**:
+    + We scan all samples with a VisNIR spectrometer to obtain their spectra.  
+    + We select 25% of the samples for traditional soil analysis, which involves measuring their SOC, texture, and pH using conventional methods. We use the spectra to subset the most diverse samples, to ensure a representative calibration dataset.  
+    + We train a multivariate calibration model with the 25% of the samples, using their reference values and spectra as inputs.  
+    + We predict the SOC, texture, and pH of the remaining 75% of the samples, using only their spectra as inputs and the calibration model as the predictor.
+
+### Example 2: Soil classification using the KSSL MIR Soil Spectral Library
+
+Soil classification is the process of grouping soils into categories based on their physical, chemical, and biological characteristics. Soil classification is useful for understanding soil formation, distribution, and management. However, obtaining the physiochemical data needed for soil classification is laborious and costly, especially for large numbers of samples. Soil survey has been conducted at state survey offices with compact instruments covering the same spectral range. Therefore, we use soil spectroscopy to obtain the physiochemical data for soil classification.
+
+We use the following method:
+
+- We scan all new soil samples with the compact MIR spectrometer to obtain their spectra.  
+- The KSSL MIR library already represents samples from soils surveyed across the US.  
+- We harmonize to ensure compatibility between the KSSL and the state survey offices’ instruments to account for differences in instrument settings and procedures. This can be done with regular preprocessing or spectral standardization, depending on the dissimilarity level.  
+- We assess the representativeness of the KSSL MIR library to the new samples using spectral similarity measures. This helps us to identify the samples that are well-covered or underrepresented by the library.
+- We apply an appropriate pre-existing model calibrated from the KSSL MIR.  
+- We predict the soil properties of interest with uncertainty.  
+
+::: {.callout-tip}
+## Tip
+In case of finding many underrepresented samples, we consider sending a portion of them to traditional laboratory analysis and incorporating them into the prediction models. This will help to reduce the prediction bias for those new locations.
+:::
+
+## Good predictions flow from good data
+
+Predictive soil spectroscopy relies on the quality and consistency of both the spectral and the reference data. There are many factors that can affect the spectral acquisition or the reference analytical data, and thus impact the performance of the predictive models.
+
+From the spectral acquisition standpoint, some of the factors that need to be considered are:  
+
+- **Instrument setup and calibration**: The spectral measurements should be done with a well-calibrated and stable instrument, following the manufacturer’s instructions and recommendations. The instrument settings, such as spectral range, resolution, and integration time, should be optimized for the soil samples and the soil properties of interest.  
+- **Operating environment**: The spectral measurements should be done under controlled and consistent environmental conditions, such as temperature, humidity, and lighting. The environmental factors can influence the spectral response of the soil samples and introduce noise or variability in the data.  
+- **Sample preparation**: The soil samples should be prepared in a uniform and standardized way, such as sieving, drying, grinding, and homogenizing. The sample preparation can affect the physical (texture estimation) and chemical properties (organic carbon occlusion) of the soil samples and their spectral characteristics.  
+- **Background material**: The spectral measurements should be done with a suitable and consistent background material (white reference plate for VisNIR, or roughened gold for MIR). The background material can influence the absorbance values of the soil samples and their spectral contrast.
+
+::: {.callout-tip}
+## Tip
+The good thing is that the community started to engage on this matter and some reference materials have been released to help in this process, such as the [KSSL Manual Method 7A7](https://www.nrcs.usda.gov/resources/guides-and-instructions/kssl-guidance) and the protocols emerging from the [IEEE SA P4005 initiative](https://sagroups.ieee.org/4005/). These reference materials provide guidance and best practices for spectral acquisition and data quality control.
+:::
+
+## Good practices for model building
+
+We need to build and evaluate multivariate or machine learning models that relate the soil spectra to the soil properties of interest. However, building good models requires careful consideration of several factors, such as spectral preprocessing, data visualization, data splitting, dimensionality reduction, model choice, model inspection, and prediction uncertainty. These factors affect the quality, accuracy, and reliability of the predictions, as well as the interpretability and validity of the models. Therefore, it is important to follow some best practices and assess the performance and suitability of the prediction models for the specific goal and context of the project:
+
+- **Spectral preprocessing**: This step involves removing noise, enhancing the signal, and making the scale comparable across different spectra.
+
+- **Data visualization and exploratory data analysis**: This step aims to answer questions such as: Are there any clusters in the data? What factors are driving the spread in the data (look at loadings)? Do a few samples have too much influence on the results? Are there any outliers? Data visualization is critical for understanding the structure and patterns of the data.
+
+- **Splitting data for calibration and validation**: This step depends on the goal of the analysis. There are two main approaches: X-fold cross-validation and test-set validation. For test-set validation, balanced selection algorithms such as Kennard Stone or Conditioned Latin Hypercube Sampling can be used to select a representative subset of the data. Cross-validation is suitable when the goal is to use all of the data to build the most widely applicable model. Test-set validation is more conservative and can provide a better estimate of the model’s performance on new data. 
+
+- **Dimensionality reduction and feature selection**: This step involves reducing the number of features in the spectra to avoid overfitting and improve interpretability, as the spectra are highly dimensional and multicolinear. Some model types, such as partial least squares regression (PLSR), perform dimensionality reduction as part of the modeling process, while others do not. There are many methods for selecting the most important features, such as variable importance in projection (VIP), regression coefficients, or variable selection algorithms developed by the ML learning community.
+
+- **Model choice**: This step is linked to the previous one, as different model types have different assumptions and properties. There are many model forms that have been applied to spectral data, such as PLSR, Cubist, and deep learning. The choice of the model type should be based on the characteristics of the data and the desired outcome (uncertainty level).
+
+- **Model inspection and interpretation**: This step is essential for evaluating the quality and validity of the model. It involves examining the factors that drive the model, such as the model coefficients and the residuals. Some models are easier to interpret than others, depending on how transparent they are. For example, PLSR can show the correlation between the spectral features and the soil variable of interest, while deep learning models are more like a black box. The model inspection should also identify any samples that are poorly predicted or have a large variation in their calibration and validation performance.
+
+- **Prediction outliers and uncertainty**: The final step is to apply the model to new data and assess the accuracy and precision of the predictions. A best practice would be to run a small percentage (5-10%) of the new samples through the reference lab analysis to truly validate the predictions, but this may not always be feasible. Alternatively, there are two ways to increase the confidence in the predictions: first, by checking how well the new samples are represented in the training set using statistics such as Hotelling T^2^, inlier distance, F ratio, or Q statistics; and second, by calculating the uncertainty around each prediction (precision) using methods such as [bootstrapping](https://en.wikipedia.org/wiki/Bootstrapping_(statistics)) or [conformal prediction](https://en.wikipedia.org/wiki/Conformal_prediction).
