@@ -218,7 +218,7 @@ div.csl-indent {
   <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization"><span class="toc-section-number">2.3</span>  Visualization</a></li>
   <li><a href="#resampling-spectra" id="toc-resampling-spectra" class="nav-link" data-scroll-target="#resampling-spectra"><span class="toc-section-number">2.4</span>  Resampling spectra</a></li>
   <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing"><span class="toc-section-number">2.5</span>  Preprocessing</a></li>
-  <li><a href="#preparing-modeling-dataset" id="toc-preparing-modeling-dataset" class="nav-link" data-scroll-target="#preparing-modeling-dataset"><span class="toc-section-number">2.6</span>  Preparing modeling dataset</a></li>
+  <li><a href="#subsec-preparing" id="toc-subsec-preparing" class="nav-link" data-scroll-target="#subsec-preparing"><span class="toc-section-number">2.6</span>  Preparing modeling dataset</a></li>
   <li><a href="#spectral-compression-and-projection" id="toc-spectral-compression-and-projection" class="nav-link" data-scroll-target="#spectral-compression-and-projection"><span class="toc-section-number">2.7</span>  Spectral compression and projection</a></li>
   <li><a href="#representation-flag" id="toc-representation-flag" class="nav-link" data-scroll-target="#representation-flag"><span class="toc-section-number">2.8</span>  Representation flag</a></li>
   </ul>
@@ -686,8 +686,8 @@ Tip
 </div>
 </div>
 </section>
-<section id="preparing-modeling-dataset" class="level2" data-number="2.6">
-<h2 data-number="2.6" class="anchored" data-anchor-id="preparing-modeling-dataset"><span class="header-section-number">2.6</span> Preparing modeling dataset</h2>
+<section id="subsec-preparing" class="level2" data-number="2.6">
+<h2 data-number="2.6" class="anchored" data-anchor-id="subsec-preparing"><span class="header-section-number">2.6</span> Preparing modeling dataset</h2>
 <p>For the <a href="modeling.html">Modeling</a> task and compression/projection, we will use the NIR Neospectra Handheld database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different devices (identified by serial number).</p>
 <p>We will prepare a case-study dataset using several operations that include reading, filtering, preprocessing with <strong>SNV</strong>, and compressing the spectra with <strong>PCA</strong> to predict Soil Organic Carbon (SOC).</p>
 <div class="cell">
@@ -1095,7 +1095,7 @@ cumulative_explained_var 9.771387e-01 9.846573e-01 9.887432e-01 9.919853e-01</co
 </section>
 <section id="representation-flag" class="level2" data-number="2.8">
 <h2 data-number="2.8" class="anchored" data-anchor-id="representation-flag"><span class="header-section-number">2.8</span> Representation flag</h2>
-<p>We can leverage the PCA and any other compression algorithms to identify identify unrepresentative spectra in predicting unknown samples.</p>
+<p>We can leverage the PCA and any other compression algorithms to identify unrepresentative spectra when predicting unknown samples.</p>
 <p>As only the first most important components are used for calibration, the remaining farther components can be used to test if a new sample is underrepresented in respect of the feature space of the calibration set. This underrepresentation flag might happen due to unique spectral features that are still present in farther components.</p>
 <p>In chemometrics, this is usually named as Control Chart. A good overview of this task can be found in <span class="citation" data-cites="deSantana2023">Santana et al. (<a href="references.html#ref-deSantana2023" role="doc-biblioref">2023</a>)</span>.</p>
 <p>In this task, each new spectrum to be predicted is back-transformed using only the first retained PCs of the model calibration. With the back-transformed version, the residual (difference between the original and back-transformed spectra) is employed to calculate the Q-statistics. The result is therefore compared against a critical value estimated across the calibration setting a predefined confidence interval (e.g., 99%).</p>

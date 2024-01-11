@@ -308,7 +308,7 @@ nir.spectra.snv %>%
   theme_light()
 ```
 
-## Preparing modeling dataset
+## Preparing modeling dataset {#subsec-preparing}
 
 For the [Modeling](#sec-modeling) task and compression/projection, we will use the NIR Neospectra Handheld database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different devices (identified by serial number).
 
@@ -551,7 +551,7 @@ write_csv(test.pca.scores, file.path(my.wd, "test.csv"))
 
 ## Representation flag
 
-We can leverage the PCA and any other compression algorithms to identify identify unrepresentative spectra in predicting unknown samples.
+We can leverage the PCA and any other compression algorithms to identify unrepresentative spectra when predicting unknown samples.
 
 As only the first most important components are used for calibration, the remaining farther components can be used to test if a new sample is underrepresented in respect of the feature space of the calibration set. This underrepresentation flag might happen due to unique spectral features that are still present in farther components.
 

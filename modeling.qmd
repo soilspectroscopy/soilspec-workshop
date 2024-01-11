@@ -2,6 +2,11 @@
 
 In this section, we introduce the modeling pipeline for estimating soil properties using soil NIR data. We will use the **mlr3** framework for modeling Soil Organic Carbon (SOC). We will train a predictive model using the NIR spectra from US soil samples, while the testing of the model's generalization happens on African soil samples.
 
+::: {.callout-note}
+## Note
+The `train.csv` and `test.csv` are prepared in the previous section: [**2.6 Preparing modeling dataset**](#subsec-preparing).
+:::
+
 The **mlr3** framework is well presented in @Bischl2024.
 
 You can also find a lot of interesting video tutorials on machine learning in [OpenGeoHub trining videos](https://av.tib.eu/publisher/OpenGeoHub_Foundation). 
