@@ -1,10 +1,10 @@
-# Modeling {#sec-modeling}
+# Machine Learning {#sec-ml}
 
-In this section, we introduce the modeling pipeline for estimating soil properties using soil NIR data. We will use the **mlr3** framework for modeling Soil Organic Carbon (SOC). We will train a predictive model using the NIR spectra from US soil samples, while the testing of the model's generalization happens on African soil samples.
+In this section, we introduce the machine learning pipeline for estimating soil properties using soil NIR data. We will use the **mlr3** framework for predicting Soil Organic Carbon (SOC). We will train a predictive model using the NIR spectra from US soil samples, while the testing of the model's generalization happens on African soil samples.
 
 ::: {.callout-note}
 ## Note
-The `train.csv` and `test.csv` are prepared in the previous section: [**2.6 Preparing modeling dataset**](#subsec-preparing).
+The `train.csv` and `test.csv` are prepared in the previous section: [**2.6 Preparing machine learning dataset**](#subsec-preparing).
 :::
 
 The **mlr3** framework is well presented in @Bischl2024.
@@ -19,8 +19,9 @@ library("Cubist") # Cubist ML algorithm
 library("ranger") # Random Forest ML algorithm
 library("glmnet") # Elastic net ML Algorithm
 library("future") # Parallel processing
-library("yardstick")
-library("mlr3extralearners")
+library("yardstick") # Additional metrics
+library("mlr3extralearners") # Additional models and features
+library("iml") # Feature importance
 ```
 
 Except for **mlr3extralearners**, you can install all the above packages using `install.packages()`. In this case, follow the intructions on [**mlr3extralearners** GitHub repository](https://github.com/mlr-org/mlr3extralearners):
@@ -32,8 +33,7 @@ remotes::install_github("mlr-org/mlr3extralearners@*release")
 
 Please, set the working directory (or load an RStudio project) in your local machine:
 ```{r working_directory}
-my.wd <- "~/projects/temp/soilspec_training"
-# my.wd = "~/robertm/opengeohub/neospectra_workshop"
+my.wd <- "~/projects/local-files/soilspec_training"
 # Or within an RStudio project
 # my.wd <- getwd()
 ```
@@ -72,7 +72,7 @@ test_matrix <- read_csv(file.path(my.wd, "test.csv"))
 
 ```{r R6_object_example, message=FALSE, warning=FALSE}
 # Creating an example object
-example_object = TaskRegr$new(id = "NIR_spectral",
+example_object <- TaskRegr$new(id = "NIR_spectral",
                               backend = train_matrix, 
                               target = "oc_usda.c729_w.pct")
 
@@ -102,8 +102,8 @@ hist(train_matrix$oc_usda.c729_w.pct, breaks = 100)
 Yes, it is. So lets apply `log1p` function to SOC values of our train and test set. `log1p` function calculates natural logarithm of the values with an offset of 1 (which avoid negative log values). 
 
 ```{r log1p, message=FALSE, warning=FALSE}
-train_matrix$oc_usda.c729_w.pct = log1p(train_matrix$oc_usda.c729_w.pct)
-test_matrix$oc_usda.c729_w.pct = log1p(test_matrix$oc_usda.c729_w.pct)
+train_matrix$oc_usda.c729_w.pct <- log1p(train_matrix$oc_usda.c729_w.pct)
+test_matrix$oc_usda.c729_w.pct <- log1p(test_matrix$oc_usda.c729_w.pct)
 hist(train_matrix$oc_usda.c729_w.pct, breaks = 100)
 ```
 
@@ -119,7 +119,7 @@ set.seed(349)
 train_matrix <- train_matrix %>%
   select(-location.country_iso.3166_txt)
 
-task_neospectra= as_task_regr(train_matrix, 
+task_neospectra <- as_task_regr(train_matrix, 
                               target = "oc_usda.c729_w.pct",
                               id = "NIR_spectral")
 
@@ -133,7 +133,7 @@ We will train a dummy model that always predicts new values as the mean of the t
 ```{r featureless_baseline, message=FALSE, warning=FALSE}
 # Load featureless learner
 # featureless = always predicts new values as the mean of the dataset
-lrn_baseline = lrn("regr.featureless")
+lrn_baseline <- lrn("regr.featureless")
 
 # Only one hyperparameter can be set: robust = calculate mean if false / calculate median if true
 # lrn_baseline$param_set
@@ -166,10 +166,10 @@ We will use [`msrs` sugar function](https://mlr3.mlr-org.com/reference/mlr_measu
 set.seed(349)
 
 # Define goodness-of-fit metrics
-measures = msrs(c("regr.rmse", "regr.bias", "regr.rsq"))
+measures <- msrs(c("regr.rmse", "regr.bias", "regr.rsq"))
 
 # Predict on a new data using $predict_newdata() method
-pred_baseline = lrn_baseline$predict_newdata(test_matrix)
+pred_baseline <- lrn_baseline$predict_newdata(test_matrix)
 
 # Evaluation on the new data applying $score() method
 pred_baseline$score(measures)
@@ -182,15 +182,15 @@ We have the baseline for now. So we can start selecting the best performing ML m
 Benchmarking is easy in **mlr3** framework thanks to predefined object classes, sugar functions and dictionaries. One has to define the set of learners for benchmarking using `lrns()` and other dictionaries. The second step is to define a `Resample` object that encapsulates the CV. We will use 10-fold CV for now. 
 
 ```{r learners_cv_benchmarking, message=FALSE, warning=FALSE}
-lrn_cv = lrns(c("regr.ranger", "regr.cv_glmnet", "regr.cubist"))
-cv10 = rsmp("cv", folds = 10)
+lrn_cv <- lrns(c("regr.ranger", "regr.cv_glmnet", "regr.cubist"))
+cv10 <- rsmp("cv", folds = 10)
 ```
 
 We can pass both objects to `benchmark_grid()` together with the task for constructing an exhaustive design that describe all combinations of the learners, tasks, and resamplings to be used in a benchmark experiment. The benchmark experiment is conducted with `benchmark()`. The results are stored in the object of the  `BenchmarkResult` class. One can access the results of benchmarking applying `$score()` or `$aggregate()` methods on the object. We can pass `Measures` object storing the selected metrics in the functions [@mlr3Eval]. 
 
 ```{r simple_benchmarking, message=FALSE, warning=FALSE, results=FALSE}
-bench_cv_grid = benchmark_grid(task_neospectra, lrn_cv, cv10)
-bench_cv = benchmark(bench_cv_grid)
+bench_cv_grid <- benchmark_grid(task_neospectra, lrn_cv, cv10)
+bench_cv <- benchmark(bench_cv_grid)
 ```
 
 ```{r simple benchmarking results, message=FALSE, warning=FALSE}
@@ -212,7 +212,7 @@ We will practice HPO with a simple model tuning using the [cubist model](https:/
 
 ```{r tune_cubist_model, message=FALSE, warning=FALSE, results=FALSE}
 # Define search space for committees and neighbors inside the Learner object using to_tune function
-lrn_cubist = lrn("regr.cubist",
+lrn_cubist <- lrn("regr.cubist",
                  committees = to_tune(1, 20),
                  neighbors = to_tune(0, 5))
 
@@ -221,7 +221,7 @@ set.seed(349)
 
 # Define tuning instance using tune() helper function
 # tune() function will automatically calls $optimize() method of the instance
-simple_tune = tune(
+simple_tune <- tune(
   method = tnr("random_search"), # Picking random combinations of hyperparameters from the search space
   task = task_neospectra, # The task with training data
   learner = lrn_cubist, # Learner algorithm
@@ -254,35 +254,35 @@ Running internal (inner) cross-validation for independent model optimization.
 ```{r inner_cv_tuning, message=FALSE, warning=FALSE, results=FALSE}
 # Selecting the spaces using sugar function ltss()
 # Not available for cubist
-spaces = ltss(c("regr.ranger.default", "regr.glmnet.default"))
+spaces <- ltss(c("regr.ranger.default", "regr.glmnet.default"))
 
 # Creating a list of learners and an empty list to write tuned learners
-lrn_cv = lrns(c("regr.ranger", "regr.glmnet"))
-lrn_cv_tuned = list()
+lrn_cv <- lrns(c("regr.ranger", "regr.glmnet"))
+lrn_cv_tuned <- list()
 
 # To avoid most of the logs
 lgr::get_logger("mlr3")$set_threshold("warn")
 
 # For loop to tune hyperparameters of every learner using random search
-for(i in 1:length(lrn_cv)) {
+i=1
+for(i in 1:length(lrn_cv)){
 
   # Using multiple cores for tuning each model
   future::plan("multisession")
-  
+
   set.seed(349)
-  instance = tune(
-    task = task_neospectra,
-    method = tnr("random_search"),
-    learner = lrn_cv[[i]],
-    resampling = cv10,
-    measures = msr("regr.rmse"),
-    term_evals = 10,
-    search_space = spaces[[i]]
-  )
-  
+  instance <- tune(task = task_neospectra,
+                   method = tnr("random_search"),
+                   learner = lrn_cv[[i]],
+                   resampling = cv10,
+                   measures = msr("regr.rmse"),
+                   term_evals = 10,
+                   search_space = spaces[[i]])
+
   # Writing tuned hyperparameters
-  lrn_cv_tuned[[i]] = lrn_cv[[i]]
-  lrn_cv_tuned[[i]]$param_set$values = instance$result_learner_param_vals
+  lrn_cv_tuned[[i]] <- lrn_cv[[i]]
+  lrn_cv_tuned[[i]]$param_set$values <- instance$result_learner_param_vals
+
 }
 
 # Close parallel connection
@@ -290,24 +290,24 @@ future:::ClusterRegistry("stop")
 
 # Adding previously tuned cubist model to the list for benchmarking
 # Create a new instance of the cubist model
-lrn_cubist_tuned = lrn("regr.cubist")
+lrn_cubist_tuned <- lrn("regr.cubist")
 
 # Set the best performing hyperparameters to the new instance
-lrn_cubist_tuned$param_set$values = simple_tune$result_learner_param_vals
+lrn_cubist_tuned$param_set$values <- simple_tune$result_learner_param_vals
 
 # Bind it to the tuned models lists
-lrn_cv_tuned = c(lrn_cv_tuned, lrn_cubist_tuned)
+lrn_cv_tuned <- c(lrn_cv_tuned, lrn_cubist_tuned)
 ```
 
 Now we can perform a complete benchmark using outer cross-validation.
 
 ```{r outer_cv_benchmarking, message=FALSE, warning=FALSE, results=FALSE}
 # Creating a benchmark grid
-bench_cv_grid = benchmark_grid(task_neospectra, lrn_cv_tuned, cv10)
+bench_cv_grid <- benchmark_grid(task_neospectra, lrn_cv_tuned, cv10)
 
 # Implementing bechmarking using multiple cores
 future::plan("multisession")
-bench_cv = benchmark(bench_cv_grid)
+bench_cv <- benchmark(bench_cv_grid)
 future:::ClusterRegistry("stop")
 ```
 
@@ -322,20 +322,47 @@ We can get the real generalization error of the best performing model by trainin
 
 ```{r final_cubist_model, message=FALSE, warning=FALSE}
 # New Cubist learner
-lrn_cubist_tuned = lrn("regr.cubist")
+lrn_cubist_tuned <- lrn("regr.cubist")
 
 # Setting the best HPs
-lrn_cubist_tuned$param_set$values = lrn_cv_tuned[[3]]$param_set$values # Cubist is the third learner in the list
+lrn_cubist_tuned$param_set$values <- lrn_cv_tuned[[3]]$param_set$values # Cubist is the third learner in the list
 
 # Fitting with whole train set
 lrn_cubist_tuned$train(task_neospectra)
 
 # Predicting on test set
-pred_cubist_response = lrn_cubist_tuned$predict_newdata(test_matrix)
+pred_cubist_response <- lrn_cubist_tuned$predict_newdata(test_matrix)
 
 # Final goodness-of-fit metrics
 pred_cubist_response$score(measures)
 ```
+
+## Model interpretation
+
+Model interpretation helps us to understand which features contribute most to the predictive performance of the model. There are many ways in doing this, and we recommend visiting [Chapter 12 of the MLR3 book](https://mlr3book.mlr-org.com/chapters/chapter12/model_interpretation.html) to learn more about the possibilities.
+
+In this section, we will explore the the **permutation feature importance (PFI)**. This methods randomly shuffles observed values for every single feature and save the model performance change before and after permuting them. Important features cause a significant change of performance when shuffled. It is a very popular method because it is model agnostic and allow the quick inspection of models by a simple procedure.
+
+Let's explore the importance of our tuned cubist model. We use 10 repetitions to be able to capture the range of the importance from several random shuffles. You can increase this number to make it more robust. As we are working with a regression task, the metric that capture the importance change is the mean squared error (mse).
+
+```{r importance, message=FALSE, warning=FALSE}
+# Grabbing the features in train data
+model_predictors <- task_neospectra$data(cols = task_neospectra$feature_names)
+
+# Grabbing the outcome in train data
+model_outcome <- task_neospectra$data(cols = task_neospectra$target_names)
+
+# Building a predictor object for importance evaluation
+predictor = Predictor$new(lrn_cubist_tuned,
+                          data = model_predictors,
+                          y = model_outcome)
+
+importance = FeatureImp$new(predictor, loss = "mse", n.repetitions = 10)
+
+importance$plot()
+```
+
+Therefore, `pc4` is largely the most important feature for SOC prediction. One can further dive into the `pc4` composition to see which spectral features are being represented by the loadings of this principal component.
 
 ## Additional accuracy assessment
 
@@ -381,11 +408,15 @@ accuracy.metrics
 
 ## Uncertainty estimation
 
-The 10-fold cross-validated predictions can be used to estimate the unbiased error (absolute residual) of the calibration set and employ them to fit an uncertainty estimation model via the [**Conformal Prediction**](https://en.wikipedia.org/wiki/Conformal_prediction) method.
+The 10-fold cross-validated predictions can be leveraged to estimate the error (absolute residual) of the calibration set and employ it to fit an uncertainty estimation model via the [**Split Conformal Prediction**](https://en.wikipedia.org/wiki/Conformal_prediction) method.
 
 ![Adapted from <http://cclp.marseille.inserm.fr/>](img/conformal_diagram.png)
 
-The error model is calibrated using the same fine-tuned structure of the response/target variable model. Conformity scores are estimated for a defined confidence level, like 5% of error probability.
+The error model is calibrated using the same fine-tuned structure of the response/target variable model.
+
+Conformity scores are estimated for a defined confidence level, like 95% of confidence level or 68% (equivalent to one standard deviation).
+
+In this part, we are going to produce 95% prediction intervals and we expect that the coverage statistics (also known as Prediciton Interval Coverage Percentage - PICP) is at least equal or higher than our predefined confidence level.
 
 ```{r uncertainty, message=FALSE, warning=FALSE}
 # Runing 10 CV with the Cubist tuned model
@@ -449,9 +480,10 @@ error_matrix <- error_matrix %>%
 error_matrix
 
 # Sample correction and final conformity score
+target_coverage = 0.95
 n_calibration <- nrow(error_matrix)
-corrected_quantile <- ((n_calibration + 1)*(1-0.05))/n_calibration
-alpha_0.95 <- quantile(error_matrix$alpha_scores, corrected_quantile)
+corrected_quantile <- ((n_calibration + 1)*(target_coverage))/n_calibration
+alpha_corrected <- quantile(error_matrix$alpha_scores, corrected_quantile)
 
 # Predicting error on test set and calculating 95% prediction interval
 # Predicting on test set
@@ -461,30 +493,34 @@ pred_cubist_error
 # Final output
 final.outputs <- accuracy.data %>%
   mutate(error = pred_cubist_error$response) %>%
-  mutate(PI95 = error*alpha_0.95) %>%
-  mutate(lower_PI = predicted-PI95,
-         upper_PI = predicted+PI95) %>%
-  select(-error, -PI95)
+  mutate(PI = error*alpha_corrected) %>%
+  mutate(lower_PI = predicted-PI,
+         upper_PI = predicted+PI) %>%
+  select(-error, -PI)
 
-final.outputs
-
-# Back-transforming all results
+# Back-transforming all results because we have used log1p earlier
 final.outputs <- final.outputs %>%
   mutate(observed = expm1(observed),
          predicted = expm1(predicted),
          lower_PI = expm1(lower_PI),
          upper_PI = expm1(upper_PI))
 
-final.outputs
-
 # Calculating coverage statistics
+
 final.outputs <- final.outputs %>%
-  mutate(covered = ifelse(observed >= lower_PI & observed <= upper_PI, TRUE, FALSE))
+  mutate(covered = ifelse(observed >= lower_PI & observed <= upper_PI, TRUE, FALSE),
+         wis = ifelse(observed < lower_PI,
+                        (upper_PI-lower_PI)+(2/(1-target_coverage))*(lower_PI-observed),
+                        ifelse(observed > upper_PI,
+                              (upper_PI-lower_PI)+(2/(1-target_coverage))*(observed-upper_PI),
+                               upper_PI-lower_PI)))
 ```
 
 ::: {.callout-note}
-We don't match 95% prediction interval (PI95%) probably because of the violation of the [**Exchangeability** assumption](https://en.wikipedia.org/wiki/Conformal_prediction#Theory). This might have happened because the test set does not come from the same geographical region and original spectral library, but conformal prediction method still does a good job (approximates to 80%) for deriving the uncertainty band. We need to use additional criteria do decide about the final predictions.
+We don't match 95% prediction interval (PI95%) probably because of the violation of the [**Exchangeability** assumption](https://en.wikipedia.org/wiki/Conformal_prediction#Theory), i.e, the train and test data might not be identically distributed. This might have happened because the test set does not come from the same geographical region and original spectral library, but split conformal prediction method still does a decent job for deriving the uncertainty band. We need to use additional criteria do decide about the reliability of the final prediction intervals.
 :::
+
+In addition to the coverage statistics, another useful statistics to evaluate the prediction intervals is the mean [Winkler Interval Score (WIS)](https://www.kaggle.com/datasets/carlmcbrideellis/winkler-interval-score-metric) @Winkler1972.
 
 ```{r final_outputs, message=FALSE, warning=FALSE}
 # Coverage statistics
@@ -495,19 +531,21 @@ final.outputs %>%
 # Final accuracy metrics in the original range
 final.accuracy <- final.outputs %>%
   summarise(n = n(),
-           rmse = rmse_vec(truth = observed, estimate = predicted),
-           bias = msd_vec(truth = observed, estimate = predicted),
-           rsq = rsq_vec(truth = observed, estimate = predicted),
-           ccc = ccc_vec(truth = observed, estimate = predicted, bias = T),
-           rpiq = rpiq_vec(truth = observed, estimate = predicted),
-           coverage = sum(covered)/n*100)
+            rmse = rmse_vec(truth = observed, estimate = predicted),
+            bias = msd_vec(truth = observed, estimate = predicted),
+            rsq = rsq_trad_vec(truth = observed, estimate = predicted),
+            ccc = ccc_vec(truth = observed, estimate = predicted, bias = T),
+            rpiq = rpiq_vec(truth = observed, estimate = predicted),
+            coverage = sum(covered)/n*100,
+            wis = mean(wis))
 
 final.accuracy
 
 # Final accuracy plot
-perfomance.annotation <- paste0("Rsq = ", round(final.accuracy[[1,"rsq"]], 3),
-                                "\nRMSE = ", round(final.accuracy[[1,"rmse"]], 3),
-                                "\nCoverage PI95% = ", round(final.accuracy[[1,"coverage"]], 3), "%")
+perfomance.annotation <- paste0("Rsq = ", round(final.accuracy[[1,"rsq"]], 2),
+                                "\nRMSE = ", round(final.accuracy[[1,"rmse"]], 2), " wt%",
+                                "\nCoverage = ", round(final.accuracy[[1,"coverage"]], 2), "%",
+                                "\nWIS = ", round(final.accuracy[[1,"wis"]], 2), " wt%")
 
 p.final <- ggplot(final.outputs) +
   geom_pointrange(aes(x = observed, y = predicted,
@@ -515,8 +553,8 @@ p.final <- ggplot(final.outputs) +
                       color = covered)) +
   geom_abline(intercept = 0, slope = 1) +
   geom_text(aes(x = -Inf, y = Inf, hjust = -0.1, vjust = 1.2),
-                label = perfomance.annotation) +
-  labs(title = "Soil Organic Carbon (%) test prediction",
+                label = perfomance.annotation, size = 3) +
+  labs(title = "Soil Organic Carbon (wt%) test prediction",
        x = "Observed", y = "Predicted", color = "PI95% covered:") +
   theme_light() + theme(legend.position = "bottom")
 

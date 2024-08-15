@@ -2,7 +2,7 @@
 
 In this section of the training workshop, we dive into the basic processing operations of soil spectroscopy data. This includes importing spectral data, making tabular and element-wise operations, visualization, resampling, preprocessing, and compression.
 
-At the end, we will produce two files using a specific processing pipeline (`train.csv` and `test.csv`) that will be employed in the next [Modeling](#sec-modeling) section.
+At the end, we will produce two files using a specific processing pipeline (`train.csv` and `test.csv`) that will be employed in the next [Machine Learning](#sec-ls) section.
 
 It is important to mention that all files are being saved to an external working directory, i.e., we are not storing big files inside this GitHub and book repository.
 
@@ -10,8 +10,7 @@ You can set an external folder as your working directory and RStudio project, an
 
 Please, set the working directory (or create an RStudio project) in your local machine:
 ```{r working_directory}
-my.wd <- "~/projects/temp/soilspec_training"
-# my.wd = "~/robertm/opengeohub/neospectra_workshop"
+my.wd <- "~/projects/local-files/soilspec_training"
 # Or within an RStudio project
 # my.wd <- getwd()
 ```
@@ -308,9 +307,9 @@ nir.spectra.snv %>%
   theme_light()
 ```
 
-## Preparing modeling dataset {#subsec-preparing}
+## Preparing machine learning dataset {#subsec-preparing}
 
-For the [Modeling](#sec-modeling) task and compression/projection, we will use the NIR Neospectra Handheld database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different devices (identified by serial number).
+For the [Machine Learning](#sec-ml) task and compression/projection, we will use the NIR Neospectra Handheld database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different devices (identified by serial number).
 
 We will prepare a case-study dataset using several operations that include reading, filtering, preprocessing with **SNV**, and compressing the spectra with **PCA** to predict Soil Organic Carbon (SOC).
 

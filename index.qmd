@@ -1,22 +1,22 @@
 # Welcome! {.unnumbered}
 
-Welcome to our training workshop on **Predictive Soil Spectroscopy**! This is an in-person event which is being held in St Louis, MO, at the [**ACS international meeting 2023**](https://www.acsmeetings.org/).
+Welcome to our training on **Predictive Soil Spectroscopy**! This material was prepared for an in-person event held in St Louis, MO, at the [**ACS international meeting 2023**](https://www.acsmeetings.org/), but now it has been online so that anyone can reuse it.
 
-Soil spectroscopy, specifically [**Diffuse Reflectance Infrared (DRIFT) spectroscopy**](https://en.wikipedia.org/wiki/Diffuse_reflectance_infrared_Fourier_transform_spectroscopy), is rapidly becoming a common tool for soil scientists in academia and in industry.
+Soil spectroscopy, specifically [**Diffuse Reflectance Infrared (DRIFT) spectroscopy**](https://en.wikipedia.org/wiki/Diffuse_reflectance_infrared_Fourier_transform_spectroscopy), is rapidly becoming a routine tool for soil scientists in academia and in industry.
 
 One of the most popular uses of soil spectroscopy is for the rapid and low-cost estimation of a number of key soil properties.
 
 This workshop touch on the basics of soil spectroscopy including project design, considerations for building a spectral library, working with large public spectral libraries and model building and prediction.
 
-Most of the learning will focus on this last topic using freely available [**R programming language**](https://www.r-project.org/about.html). Participants are expected to bring their own laptops with the latest versions of R and RStudio installed.
+Most of the learning will focus on using the freely available [**R programming language**](https://www.r-project.org/about.html).
+
+This material was prepared with R version `4.3.0` and it is recommended to use RStudio as the graphical user interface.
 
 # Prerequisites {.unnumbered}
 
-We have shared by email two links for subscribing to [Mattermost](https://mattermost.com/) and to our dedicated **Channel**. Let's use it for chatting and sharing questions!
+This training is mostly focused on the use of **tidy** programming principles with pipe operators, leveraging the R packages from the [**tidyverse**](https://www.tidyverse.org/) like **dplyr**, **tidyr**, and **ggplot2**.
 
-Similarly, to learn more about your experience with R, we have shared a **pre-workshop survey** on the basics of R programming.
-
-In any case, this training is mostly focused on the use of **tidy** programming principles with pipe operators, leveraging the R packages from the [**tidyverse**](https://www.tidyverse.org/) like **dplyr**, **tidyr** and **ggplot2**.
+For the modeling framework, however, we decided to use the [**MLR3**](https://mlr3book.mlr-org.com/) ecosystem.
 
 If you are interested in getting started in R using tidy packages and principles, we strongly recommend vising the [**R 4 Data Science**](https://r4ds.had.co.nz/) book page:
 
@@ -28,9 +28,13 @@ Other spectral operations, like importing raw files, preprocessing, compression,
 
 # Recommended literature {.unnumbered}
 
-The fundamentals of infrared spectroscopy are well presented in [Johnston & Aochi (2018)](https://doi.org/10.2136/sssabookser5.3.c10), while [Wadoux et al. (2021)](https://doi.org/10.1007/978-3-030-64896-1) provides a great walk-through of soil spectral inference in R.
+The fundamentals of infrared spectroscopy are well presented in [Johnston & Aochi (2018)](https://doi.org/10.2136/sssabookser5.3.c10) and [Stenberg & Viscarra-Rossel (2018)](https://doi.org/10.1007/978-90-481-8859-8_3), while [Wadoux et al. (2021)](https://doi.org/10.1007/978-3-030-64896-1) provides a great walk-through of soil spectral inference in R.
 
 - Johnston, C. T., & Aochi, Y. O. (2018). Fourier Transform Infrared and Raman Spectroscopy (pp. 269–321). <https://doi.org/10.2136/sssabookser5.3.c10>
+
+- Stenberg, B., Viscarra-Rossel, R. (2010). Diffuse Reflectance Spectroscopy for High-Resolution Soil Sensing. In: Viscarra Rossel, R., McBratney, A., Minasny, B. (eds) Proximal Soil Sensing. Progress in Soil Science. Springer, Dordrecht. <https://doi.org/10.1007/978-90-481-8859-8_3>
+
+- Margenot A.J., Calderón F.J., Goyne K.W., Mukome F.N.D and Parikh S.J. (2017) IR Spectroscopy, Soil Analysis Applications. In: Lindon, J.C., Tranter, G.E., and Koppenaal, D.W. (eds.) The Encyclopedia of Spectroscopy and Spectrometry, 3rd edition vol. 2, pp. 448-454. Oxford: Academic Press. <http://dx.doi.org/10.1016/B978-0-12-409547-2.12170-5>
 
 - Wadoux, A. M. J.-C., Malone, B., Minasny, B., Fajardo, M., & McBratney, A. B. (2021). Soil Spectral Inference with R. In Progress in Soil Science. Springer International Publishing. <https://doi.org/10.1007/978-3-030-64896-1>
 

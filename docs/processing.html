@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.4.550">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -17,11 +17,12 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -46,48 +47,20 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+/* CSS for citations */
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
+  margin-bottom: 0em;
 }
-.hanging div.csl-entry {
+.hanging-indent div.csl-entry {
   margin-left:2em;
   text-indent:-2em;
 }
@@ -101,8 +74,7 @@ div.csl-right-inline {
 }
 div.csl-indent {
   margin-left: 2em;
-}
-</style>
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -129,7 +101,13 @@ div.csl-indent {
   "collapse-after": 3,
   "panel-placement": "start",
   "type": "textbox",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -138,12 +116,42 @@ div.csl-indent {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -151,11 +159,16 @@ div.csl-indent {
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Processing</span></h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./processing.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Processing</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
       </button>
     </div>
   </nav>
@@ -163,73 +176,79 @@ div.csl-indent {
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
       <a href="./">Predictive Soil Spectroscopy</a> 
         <div class="sidebar-tools-main">
-    <a href="https://github.com/soilspectroscopy/soilspec-workshop/" title="Source Code" class="sidebar-tool px-1"><i class="bi bi-github"></i></a>
+    <a href="https://github.com/soilspectroscopy/soilspec-workshop/" title="Source Code" class="quarto-navigation-tool px-1" aria-label="Source Code"><i class="bi bi-github"></i></a>
 </div>
     </div>
       </div>
-      <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="mt-2 flex-shrink-0 align-items-center">
         <div class="sidebar-search">
         <div id="quarto-search" class="" title="Search"></div>
         </div>
-      </div>
+        </div>
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link">Welcome!</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Welcome!</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./intro.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></a>
+  <a href="./intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./processing.html" class="sidebar-item-text sidebar-link active"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Processing</span></a>
+  <a href="./processing.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Processing</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./modeling.html" class="sidebar-item-text sidebar-link"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modeling</span></a>
+  <a href="./modeling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Machine Learning</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./references.html" class="sidebar-item-text sidebar-link">References</a>
+  <a href="./references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
   </div>
 </li>
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#importing-spectra" id="toc-importing-spectra" class="nav-link active" data-scroll-target="#importing-spectra"><span class="toc-section-number">2.1</span>  Importing spectra</a></li>
-  <li><a href="#tabular-operations" id="toc-tabular-operations" class="nav-link" data-scroll-target="#tabular-operations"><span class="toc-section-number">2.2</span>  Tabular operations</a></li>
-  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization"><span class="toc-section-number">2.3</span>  Visualization</a></li>
-  <li><a href="#resampling-spectra" id="toc-resampling-spectra" class="nav-link" data-scroll-target="#resampling-spectra"><span class="toc-section-number">2.4</span>  Resampling spectra</a></li>
-  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing"><span class="toc-section-number">2.5</span>  Preprocessing</a></li>
-  <li><a href="#subsec-preparing" id="toc-subsec-preparing" class="nav-link" data-scroll-target="#subsec-preparing"><span class="toc-section-number">2.6</span>  Preparing modeling dataset</a></li>
-  <li><a href="#spectral-compression-and-projection" id="toc-spectral-compression-and-projection" class="nav-link" data-scroll-target="#spectral-compression-and-projection"><span class="toc-section-number">2.7</span>  Spectral compression and projection</a></li>
-  <li><a href="#representation-flag" id="toc-representation-flag" class="nav-link" data-scroll-target="#representation-flag"><span class="toc-section-number">2.8</span>  Representation flag</a></li>
+  <li><a href="#importing-spectra" id="toc-importing-spectra" class="nav-link active" data-scroll-target="#importing-spectra"><span class="header-section-number">2.1</span> Importing spectra</a></li>
+  <li><a href="#tabular-operations" id="toc-tabular-operations" class="nav-link" data-scroll-target="#tabular-operations"><span class="header-section-number">2.2</span> Tabular operations</a></li>
+  <li><a href="#visualization" id="toc-visualization" class="nav-link" data-scroll-target="#visualization"><span class="header-section-number">2.3</span> Visualization</a></li>
+  <li><a href="#resampling-spectra" id="toc-resampling-spectra" class="nav-link" data-scroll-target="#resampling-spectra"><span class="header-section-number">2.4</span> Resampling spectra</a></li>
+  <li><a href="#preprocessing" id="toc-preprocessing" class="nav-link" data-scroll-target="#preprocessing"><span class="header-section-number">2.5</span> Preprocessing</a></li>
+  <li><a href="#subsec-preparing" id="toc-subsec-preparing" class="nav-link" data-scroll-target="#subsec-preparing"><span class="header-section-number">2.6</span> Preparing machine learning dataset</a></li>
+  <li><a href="#spectral-compression-and-projection" id="toc-spectral-compression-and-projection" class="nav-link" data-scroll-target="#spectral-compression-and-projection"><span class="header-section-number">2.7</span> Spectral compression and projection</a></li>
+  <li><a href="#representation-flag" id="toc-representation-flag" class="nav-link" data-scroll-target="#representation-flag"><span class="header-section-number">2.8</span> Representation flag</a></li>
   </ul>
-<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/soilspectroscopy/soilspec-workshop/edit/main/processing.qmd" class="toc-action">Edit this page</a></p><p><a href="https://github.com/soilspectroscopy/soilspec-workshop/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/soilspectroscopy/soilspec-workshop/edit/main/processing.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/soilspectroscopy/soilspec-workshop/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Processing</span></h1>
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Processing</span></h1>
 </div>
 
 
@@ -242,18 +261,19 @@ div.csl-indent {
   </div>
   
 
+
 </header>
 
+
 <p>In this section of the training workshop, we dive into the basic processing operations of soil spectroscopy data. This includes importing spectral data, making tabular and element-wise operations, visualization, resampling, preprocessing, and compression.</p>
-<p>At the end, we will produce two files using a specific processing pipeline (<code>train.csv</code> and <code>test.csv</code>) that will be employed in the next <a href="modeling.html">Modeling</a> section.</p>
+<p>At the end, we will produce two files using a specific processing pipeline (<code>train.csv</code> and <code>test.csv</code>) that will be employed in the next <a href="#sec-ls">Machine Learning</a> section.</p>
 <p>It is important to mention that all files are being saved to an external working directory, i.e., we are not storing big files inside this GitHub and book repository.</p>
 <p>You can set an external folder as your working directory and RStudio project, and copy/paste the code chunks of this session into plain R scripts.</p>
 <p>Please, set the working directory (or create an RStudio project) in your local machine:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my.wd <span class="ot">&lt;-</span> <span class="st">"~/projects/temp/soilspec_training"</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># my.wd = "~/robertm/opengeohub/neospectra_workshop"</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Or within an RStudio project</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># my.wd &lt;- getwd()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>my.wd <span class="ot">&lt;-</span> <span class="st">"~/projects/local-files/soilspec_training"</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Or within an RStudio project</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># my.wd &lt;- getwd()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>A list of all required packages for this section is provided in the following code chunk. You will see that some specific/special functions are highlighted in the text by linking back the function with the original package using the <code>package::function()</code> syntax:</p>
 <div class="cell">
@@ -470,19 +490,23 @@ div.csl-indent {
 <span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/visualization-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
 <section id="resampling-spectra" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="resampling-spectra"><span class="header-section-number">2.4</span> Resampling spectra</h2>
 <p>From the previous table views, we saw the spectral column headers are being represented by an uneven interval with floating numbers. We can resample or harmonize the spectra (using the <strong>prospectr</strong> R package) to a defined range with an even interval (e.g.&nbsp;2 nm) using spline interpolation. For this, we need to use the spectra stored as a wide table</p>
-<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Note
 </div>
 </div>
@@ -504,12 +528,12 @@ Note
 <pre><code>[1] 1350 1352 1354 1356 1358 1360</code></pre>
 </div>
 </div>
-<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Tip
 </div>
 </div>
@@ -547,12 +571,12 @@ Tip
 </div>
 </div>
 <p>The harmonization/resample results in the same spectral patterns, but now the data is well formatted.</p>
-<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Tip
 </div>
 </div>
@@ -574,7 +598,11 @@ Tip
 <span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/visualization_resample-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/visualization_resample-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -614,12 +642,12 @@ Tip
 </div>
 </div>
 <p>Moving-window first-derivatives are great because they preserve the orientation of the absorption features and enhance only the important regions of the spectra. For more complex spectra, however, this may hamper the interpretation.</p>
-<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<div class="callout-caption-container flex-fill">
+<div class="callout-title-container flex-fill">
 Tip
 </div>
 </div>
@@ -639,7 +667,11 @@ Tip
 <span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/sg_visualization-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/sg_visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Another very common preprocessing is the Standard Normal Variate (SNV). SNV is a normalization algorithm (centers to mean 0 and rescales to 1 standard deviation) that works across the spectrum (row-wise). This preprocessing changes both the range of values and the amplitude of the curves and is intended to correct the scattering of light.</p>
@@ -682,13 +714,17 @@ Tip
 <span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/snv_visualization-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/snv_visualization-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
 <section id="subsec-preparing" class="level2" data-number="2.6">
-<h2 data-number="2.6" class="anchored" data-anchor-id="subsec-preparing"><span class="header-section-number">2.6</span> Preparing modeling dataset</h2>
-<p>For the <a href="modeling.html">Modeling</a> task and compression/projection, we will use the NIR Neospectra Handheld database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different devices (identified by serial number).</p>
+<h2 data-number="2.6" class="anchored" data-anchor-id="subsec-preparing"><span class="header-section-number">2.6</span> Preparing machine learning dataset</h2>
+<p>For the <a href="modeling.html">Machine Learning</a> task and compression/projection, we will use the NIR Neospectra Handheld database shared as part of the OSSL that contains more than 2000 unique soil samples scanned in replicates with different devices (identified by serial number).</p>
 <p>We will prepare a case-study dataset using several operations that include reading, filtering, preprocessing with <strong>SNV</strong>, and compressing the spectra with <strong>PCA</strong> to predict Soil Organic Carbon (SOC).</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Internet configuration for downloading big datasets</span></span>
@@ -921,7 +957,11 @@ Tip
 <span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.25</span>, <span class="at">linewidth =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
 <span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/neospectra_view-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/neospectra_view-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p><strong>Preprocessing with Standard Normal Variate (SNV).</strong></p>
@@ -945,7 +985,11 @@ Tip
 <span id="cb74-17"><a href="#cb74-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.25</span>, <span class="at">linewidth =</span> <span class="fl">0.25</span>) <span class="sc">+</span></span>
 <span id="cb74-18"><a href="#cb74-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/neospectra_snv-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/neospectra_snv-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p><strong>Joining data and spliting for train/test</strong></p>
@@ -986,7 +1030,7 @@ Tip
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://carpentries-incubator.github.io/high-dimensional-stats-r/fig/pendulum.gif" class="img-fluid figure-img"></p>
-<p></p><figcaption class="figure-caption">Source: carpentries-incubator.github.io</figcaption><p></p>
+<figcaption>Source: carpentries-incubator.github.io</figcaption>
 </figure>
 </div>
 <p><strong>Partial Least Squares (PLS)</strong> and <strong>Principal Component Analysis (PCA)</strong> are popular orthogonal projection methods that helps to build regression models or explore the associations between spectra and variables of interest. Within this scope, orthogonalization means the production of uncorrelated features (predictors) such as the correlation between any pair of the new variables is 0 <span class="citation" data-cites="chang2001 deSantana2023">(<a href="references.html#ref-chang2001" role="doc-biblioref">Chang et al. 2001</a>; <a href="references.html#ref-deSantana2023" role="doc-biblioref">Santana et al. 2023</a>)</span>.</p>
@@ -1018,7 +1062,11 @@ Tip
 <pre><code>Warning in par(opar): argument 1 does not name a graphical parameter</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/compression-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/compression-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co"># We can get the scores and exp. variance back and make a plot</span></span>
 <span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>train.pca.scores <span class="ot">&lt;-</span> train.pca<span class="sc">$</span>scores <span class="sc">%&gt;%</span></span>
@@ -1056,7 +1104,11 @@ cumulative_explained_var 9.771387e-01 9.846573e-01 9.887432e-01 9.919853e-01</co
 <span id="cb84-11"><a href="#cb84-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>() <span class="sc">+</span></span>
 <span id="cb84-12"><a href="#cb84-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>); p.pca</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/compression-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/compression-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Predicting the test samples and plotting</span></span>
 <span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>test.pca.scores <span class="ot">&lt;-</span> neospectra.test <span class="sc">%&gt;%</span></span>
@@ -1077,7 +1129,11 @@ cumulative_explained_var 9.771387e-01 9.846573e-01 9.887432e-01 9.919853e-01</co
 <span id="cb85-17"><a href="#cb85-17" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">0.75</span>) <span class="sc">+</span></span>
 <span id="cb85-18"><a href="#cb85-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">subtitle =</span> <span class="st">"Black dots represent testing points"</span>); p.pca.test</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/compression-3.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/compression-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p><strong>Saving files</strong></p>
@@ -1168,7 +1224,11 @@ cumulative_explained_var 9.771387e-01 9.846573e-01 9.887432e-01 9.919853e-01</co
 <span id="cb87-66"><a href="#cb87-66" aria-hidden="true" tabindex="-1"></a>            <span class="at">alpha =</span> <span class="fl">0.5</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb87-67"><a href="#cb87-67" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_light</span>() <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/backtransform-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/backtransform-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We can see there are some subtle mismatch between the original and back-transformed spectra, and depending on the importance of those underrepresented features in the calibration models, the new spectra might not be properly compressed and yield unsatisfactory prediction. We use this approach to flag potential outliers or underrepresented samples before model prediction.</p>
@@ -1227,34 +1287,38 @@ cumulative_explained_var 9.771387e-01 9.846573e-01 9.887432e-01 9.919853e-01</co
 <span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">shape =</span> <span class="dv">21</span>, <span class="at">size =</span> <span class="fl">1.5</span>) <span class="sc">+</span></span>
 <span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">fill =</span> <span class="st">"Represented?"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="processing_files/figure-html/q_flag-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="processing_files/figure-html/q_flag-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 
 
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography" style="display: none">
-<div id="ref-Barnes1989" class="csl-entry" role="doc-biblioentry">
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list" style="display: none">
+<div id="ref-Barnes1989" class="csl-entry" role="listitem">
 Barnes, R. J., M. S. Dhanoa, and Susan J. Lister. 1989. <span>“Standard Normal Variate Transformation and de-Trending of Near-Infrared Diffuse Reflectance Spectra.”</span> <em>Applied Spectroscopy</em> 43 (5): 772–77. <a href="https://doi.org/10.1366/0003702894202201">https://doi.org/10.1366/0003702894202201</a>.
 </div>
-<div id="ref-Barra2021" class="csl-entry" role="doc-biblioentry">
+<div id="ref-Barra2021" class="csl-entry" role="listitem">
 Barra, Issam, Stephan M. Haefele, Ruben Sakrabani, and Fassil Kebede. 2021. <span>“Soil Spectroscopy with the Use of Chemometrics, Machine Learning and Pre-Processing Techniques in Soil Diagnosis: Recent Advances<span></span>a Review.”</span> <em><span>TrAC</span> Trends in Analytical Chemistry</em> 135 (February): 116166. <a href="https://doi.org/10.1016/j.trac.2020.116166">https://doi.org/10.1016/j.trac.2020.116166</a>.
 </div>
-<div id="ref-chang2001" class="csl-entry" role="doc-biblioentry">
+<div id="ref-chang2001" class="csl-entry" role="listitem">
 Chang, Cheng-Wen, David Laird, Maurice J Mausbach, and Charles R Hurburgh Jr. 2001. <span>“Near-Infrared Reflectance Spectroscopy–Principal Components Regression Analyses of Soil Properties.”</span> <em>Soil Science Society of America Journal</em> 65 (2): 480. <a href="https://doi.org/10.2136/sssaj2001.652480x">https://doi.org/10.2136/sssaj2001.652480x</a>.
 </div>
-<div id="ref-Dotto2018" class="csl-entry" role="doc-biblioentry">
+<div id="ref-Dotto2018" class="csl-entry" role="listitem">
 Dotto, Andre Carnieletto, Ricardo Simao Diniz Dalmolin, Alexandre ten Caten, and Sabine Grunwald. 2018. <span>“A Systematic Study on the Application of Scatter-Corrective and Spectral-Derivative Preprocessing for Multivariate Prediction of Soil Organic Carbon by Vis-<span>NIR</span> Spectra.”</span> <em>Geoderma</em> 314 (March): 262–74. <a href="https://doi.org/10.1016/j.geoderma.2017.11.006">https://doi.org/10.1016/j.geoderma.2017.11.006</a>.
 </div>
-<div id="ref-Jackson1979" class="csl-entry" role="doc-biblioentry">
+<div id="ref-Jackson1979" class="csl-entry" role="listitem">
 Jackson, J. Edward, and Govind S. Mudholkar. 1979. <span>“Control Procedures for Residuals Associated with Principal Component Analysis.”</span> <em>Technometrics</em> 21 (3): 341–49. <a href="https://doi.org/10.1080/00401706.1979.10489779">https://doi.org/10.1080/00401706.1979.10489779</a>.
 </div>
-<div id="ref-Laursen2011" class="csl-entry" role="doc-biblioentry">
+<div id="ref-Laursen2011" class="csl-entry" role="listitem">
 Laursen, Kristoffer, Morten A. Rasmussen, and Rasmus Bro. 2011. <span>“Comprehensive Control Charting Applied to Chromatography.”</span> <em>Chemometrics and Intelligent Laboratory Systems</em> 107 (1): 215–25. <a href="https://doi.org/10.1016/j.chemolab.2011.04.002">https://doi.org/10.1016/j.chemolab.2011.04.002</a>.
 </div>
-<div id="ref-deSantana2023" class="csl-entry" role="doc-biblioentry">
+<div id="ref-deSantana2023" class="csl-entry" role="listitem">
 Santana, Felipe B. de, Rebecca.L. Hall, Victoria Lowe, Margaret A. Browne, Eric C. Grunsky, Mairéad M. Fitzsimons, Vincent Gallagher, and Karen Daly. 2023. <span>“A Systematic Approach to Predicting and Mapping Soil Particle Size Distribution from Unknown Samples Using Large Mid-Infrared Spectral Libraries Covering Large-Scale Heterogeneous Areas.”</span> <em>Geoderma</em> 434 (June): 116491. <a href="https://doi.org/10.1016/j.geoderma.2023.116491">https://doi.org/10.1016/j.geoderma.2023.116491</a>.
 </div>
-<div id="ref-Seybold2019" class="csl-entry" role="doc-biblioentry">
+<div id="ref-Seybold2019" class="csl-entry" role="listitem">
 Seybold, Cathy A., Rich Ferguson, Doug Wysocki, Scarlett Bailey, Joe Anderson, Brian Nester, Phil Schoeneberger, et al. 2019. <span>“Application of Mid-Infrared Spectroscopy in Soil Survey.”</span> <em>Soil Science Society of America Journal</em> 83 (6): 1746–59. <a href="https://doi.org/10.2136/sssaj2019.06.0205">https://doi.org/10.2136/sssaj2019.06.0205</a>.
 </div>
 </div>
@@ -1288,9 +1352,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -1326,10 +1404,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -1339,8 +1416,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -1355,6 +1441,238 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -1396,23 +1714,31 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./intro.html" class="pagination-link">
+      <a href="./intro.html" class="pagination-link" aria-label="Introduction">
         <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Introduction</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="./modeling.html" class="pagination-link">
-        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Modeling</span></span> <i class="bi bi-arrow-right-short"></i>
+      <a href="./modeling.html" class="pagination-link" aria-label="Machine Learning">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Machine Learning</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav>
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">This handout was written by Jose L. Safanelli, Robert Minarik, Jonathan Sanderman, and Tomislav Hengl.</div>   
-    <div class="nav-footer-right">This book was built with <a href="https://quarto.org/">Quarto</a>.</div>
+    <div class="nav-footer-left">
+<p>This handout was written by Jose L. Safanelli, Robert Minarik, Jonathan Sanderman, and Tomislav Hengl.</p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    <div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/soilspectroscopy/soilspec-workshop/edit/main/processing.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/soilspectroscopy/soilspec-workshop/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div>
+    <div class="nav-footer-right">
+<p>This book was built with <a href="https://quarto.org/">Quarto</a>.</p>
+</div>
   </div>
 </footer>
+
 
 
 
