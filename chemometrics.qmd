@@ -111,7 +111,7 @@ neospectra %>%
 
 ## Chemometric modeling
 
-To start with, the **mdatools** offer a series of built-in function for preprocessing spectra. We are going to use the **Standard Normal Variate** function.
+To start with chemometrics, the **mdatools** offer a series of built-in function for preprocessing spectra. We are going to use the **Standard Normal Variate** function.
 
 ```{r preprocessing, message=FALSE, warning=FALSE}
 # Preprocessing with SNV
@@ -164,8 +164,6 @@ neospectra.test.outcome <- neospectra.test %>%
   select(oc_usda.c729_w.pct) %>%
   mutate(oc_usda.c729_w.pct = log1p(oc_usda.c729_w.pct))
 ```
-
-## Chemometric modeling
 
 Now we just feed the preprocessed spectra into the PLSR algorithm.
 

@@ -23,15 +23,15 @@ book:
       orcid: 0000-0002-5654-1522
       email: robert.minarik@opengeohub.org
       affiliations: OpenGeoHub Foundation
-    - name: Jonathan Sanderman
-      orcid: 0000-0002-3215-1706
-      email: jsanderman@woodwellclimate.org
-      affiliations: Woodwell Climate Research Center
     - name: Tomislav Hengl
       orcid: 0000-0002-9921-5129
       email: tom.hengl@opengeohub.org
       affiliations: OpenGeoHub Foundation
-  date: "10/2/2023"
+    - name: Jonathan Sanderman
+      orcid: 0000-0002-3215-1706
+      email: jsanderman@woodwellclimate.org
+      affiliations: Woodwell Climate Research Center
+  date: "08/01/2024"
   chapters:
     - index.qmd
     - intro.qmd

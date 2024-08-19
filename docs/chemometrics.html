@@ -240,7 +240,6 @@ window.Quarto = {
   <ul>
   <li><a href="#preparation-of-files" id="toc-preparation-of-files" class="nav-link active" data-scroll-target="#preparation-of-files"><span class="header-section-number">4.1</span> Preparation of files</a></li>
   <li><a href="#chemometric-modeling" id="toc-chemometric-modeling" class="nav-link" data-scroll-target="#chemometric-modeling"><span class="header-section-number">4.2</span> Chemometric modeling</a></li>
-  <li><a href="#chemometric-modeling-1" id="toc-chemometric-modeling-1" class="nav-link" data-scroll-target="#chemometric-modeling-1"><span class="header-section-number">4.3</span> Chemometric modeling</a></li>
   <li><a href="#model-and-predictions-interpretation" id="toc-model-and-predictions-interpretation" class="nav-link" data-scroll-target="#model-and-predictions-interpretation"><span class="header-section-number">5</span> Model and predictions interpretation</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/soilspectroscopy/soilspec-workshop/edit/main/chemometrics.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/soilspectroscopy/soilspec-workshop/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -389,7 +388,7 @@ window.Quarto = {
 </section>
 <section id="chemometric-modeling" class="level2" data-number="4.2">
 <h2 data-number="4.2" class="anchored" data-anchor-id="chemometric-modeling"><span class="header-section-number">4.2</span> Chemometric modeling</h2>
-<p>To start with, the <strong>mdatools</strong> offer a series of built-in function for preprocessing spectra. We are going to use the <strong>Standard Normal Variate</strong> function.</p>
+<p>To start with chemometrics, the <strong>mdatools</strong> offer a series of built-in function for preprocessing spectra. We are going to use the <strong>Standard Normal Variate</strong> function.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Preprocessing with SNV</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>neospectra.snv <span class="ot">&lt;-</span> neospectra <span class="sc">%&gt;%</span></span>
@@ -445,9 +444,6 @@ window.Quarto = {
 <span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(oc_usda.c729_w.pct) <span class="sc">%&gt;%</span></span>
 <span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">oc_usda.c729_w.pct =</span> <span class="fu">log1p</span>(oc_usda.c729_w.pct))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
-<section id="chemometric-modeling-1" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="chemometric-modeling-1"><span class="header-section-number">4.3</span> Chemometric modeling</h2>
 <p>Now we just feed the preprocessed spectra into the PLSR algorithm.</p>
 <p>PLSR in this case, will compress the spectra into several orthogonal features that both maximize the variance in the spectra and the soil property of interest, in this case, SOC. The resulting scores from these latent factors are feed in a multivariate linear regression model.</p>
 <div class="callout callout-style-default callout-note callout-titled">
