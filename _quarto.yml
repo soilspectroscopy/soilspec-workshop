@@ -6,8 +6,8 @@ book:
   title: "Predictive Soil Spectroscopy"
   page-footer:
     left: |
-      This handout was written by Jose L. Safanelli, Robert Minarik,
-      Jonathan Sanderman, and Tomislav Hengl.
+      This training material was written by Jose L. Safanelli, Robert Minarik,
+      Tomislav Hengl, and Jonathan Sanderman.
     right: |
       This book was built with <a href="https://quarto.org/">Quarto</a>.
   site-url: https://soilspectroscopy.github.io/soilspec-workshop/
@@ -37,6 +37,7 @@ book:
     - intro.qmd
     - processing.qmd
     - modeling.qmd
+    - chemometrics.qmd
     - references.qmd
 
 bibliography: references.bib
@@ -48,4 +49,3 @@ format:
     documentclass: scrreprt
 
 editor: source
-

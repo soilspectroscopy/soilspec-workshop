@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://soilspectroscopy.github.io/soilspec-workshop/index.html</loc>
-    <lastmod>2024-08-15T13:24:23.844Z</lastmod>
+    <lastmod>2024-08-19T01:08:01.770Z</lastmod>
   </url>
   <url>
     <loc>https://soilspectroscopy.github.io/soilspec-workshop/intro.html</loc>
@@ -10,14 +10,18 @@
   </url>
   <url>
     <loc>https://soilspectroscopy.github.io/soilspec-workshop/processing.html</loc>
-    <lastmod>2024-08-15T14:13:47.001Z</lastmod>
+    <lastmod>2024-08-16T11:46:19.106Z</lastmod>
   </url>
   <url>
     <loc>https://soilspectroscopy.github.io/soilspec-workshop/modeling.html</loc>
-    <lastmod>2024-08-15T14:35:10.374Z</lastmod>
+    <lastmod>2024-08-16T11:46:32.110Z</lastmod>
   </url>
   <url>
     <loc>https://soilspectroscopy.github.io/soilspec-workshop/references.html</loc>
     <lastmod>2023-10-02T21:28:11.455Z</lastmod>
+  </url>
+  <url>
+    <loc>https://soilspectroscopy.github.io/soilspec-workshop/chemometrics.html</loc>
+    <lastmod>2024-08-18T12:11:39.612Z</lastmod>
   </url>
 </urlset>

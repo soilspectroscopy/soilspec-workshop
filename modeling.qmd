@@ -9,7 +9,7 @@ The `train.csv` and `test.csv` are prepared in the previous section: [**2.6 Prep
 
 The **mlr3** framework is well presented in @Bischl2024.
 
-You can also find a lot of interesting video tutorials on machine learning in [OpenGeoHub trining videos](https://av.tib.eu/publisher/OpenGeoHub_Foundation). 
+You can also find a lot of interesting video tutorials on machine learning in [OpenGeoHub training videos](https://av.tib.eu/publisher/OpenGeoHub_Foundation). 
 
 A list of all required packages for this section is provided in the following code chunk:  
 ```{r, libraries, message=FALSE, warning=FALSE}

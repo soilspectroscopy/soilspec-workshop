@@ -2,7 +2,7 @@
 
 In this section of the training workshop, we dive into the basic processing operations of soil spectroscopy data. This includes importing spectral data, making tabular and element-wise operations, visualization, resampling, preprocessing, and compression.
 
-At the end, we will produce two files using a specific processing pipeline (`train.csv` and `test.csv`) that will be employed in the next [Machine Learning](#sec-ls) section.
+At the end, we will produce two files using a specific processing pipeline (`train.csv` and `test.csv`) that will be employed in the next [Machine Learning](#sec-ml) section.
 
 It is important to mention that all files are being saved to an external working directory, i.e., we are not storing big files inside this GitHub and book repository.
 

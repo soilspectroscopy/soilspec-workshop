@@ -6,7 +6,7 @@ Soil spectroscopy, specifically [**Diffuse Reflectance Infrared (DRIFT) spectros
 
 One of the most popular uses of soil spectroscopy is for the rapid and low-cost estimation of a number of key soil properties.
 
-This workshop touch on the basics of soil spectroscopy including project design, considerations for building a spectral library, working with large public spectral libraries and model building and prediction.
+This workshop touch on the basics of soil spectroscopy including project design, considerations for building a spectral library, working with large public spectral libraries and model building, prediction, and interpretability.
 
 Most of the learning will focus on using the freely available [**R programming language**](https://www.r-project.org/about.html).
 
@@ -16,7 +16,11 @@ This material was prepared with R version `4.3.0` and it is recommended to use R
 
 This training is mostly focused on the use of **tidy** programming principles with pipe operators, leveraging the R packages from the [**tidyverse**](https://www.tidyverse.org/) like **dplyr**, **tidyr**, and **ggplot2**.
 
-For the modeling framework, however, we decided to use the [**MLR3**](https://mlr3book.mlr-org.com/) ecosystem.
+For the machine learning framework, we decided to use the [**MLR3**](https://mlr3book.mlr-org.com/) ecosystem.
+
+Alternatively, we have included a chemometrics chapter where the common tools and algorithms for working with spectral data are introduced. This was possible with the amazing package [**mdatools**](https://mdatools.com/docs/index.html).
+
+We do, however, recommend that you keep an eye on this online training material as it keeps evolving in time and new methods may be incorporated.
 
 If you are interested in getting started in R using tidy packages and principles, we strongly recommend vising the [**R 4 Data Science**](https://r4ds.had.co.nz/) book page:
 

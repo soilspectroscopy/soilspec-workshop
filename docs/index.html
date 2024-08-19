@@ -139,6 +139,12 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./chemometrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Chemometrics</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./references.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">References</span></a>
   </div>
@@ -233,14 +239,16 @@ ul.task-list li input[type="checkbox"] {
 <p>Welcome to our training on <strong>Predictive Soil Spectroscopy</strong>! This material was prepared for an in-person event held in St Louis, MO, at the <a href="https://www.acsmeetings.org/"><strong>ACS international meeting 2023</strong></a>, but now it has been online so that anyone can reuse it.</p>
 <p>Soil spectroscopy, specifically <a href="https://en.wikipedia.org/wiki/Diffuse_reflectance_infrared_Fourier_transform_spectroscopy"><strong>Diffuse Reflectance Infrared (DRIFT) spectroscopy</strong></a>, is rapidly becoming a routine tool for soil scientists in academia and in industry.</p>
 <p>One of the most popular uses of soil spectroscopy is for the rapid and low-cost estimation of a number of key soil properties.</p>
-<p>This workshop touch on the basics of soil spectroscopy including project design, considerations for building a spectral library, working with large public spectral libraries and model building and prediction.</p>
+<p>This workshop touch on the basics of soil spectroscopy including project design, considerations for building a spectral library, working with large public spectral libraries and model building, prediction, and interpretability.</p>
 <p>Most of the learning will focus on using the freely available <a href="https://www.r-project.org/about.html"><strong>R programming language</strong></a>.</p>
 <p>This material was prepared with R version <code>4.3.0</code> and it is recommended to use RStudio as the graphical user interface.</p>
 </section>
 <section id="prerequisites" class="level1 unnumbered">
 <h1 class="unnumbered">Prerequisites</h1>
 <p>This training is mostly focused on the use of <strong>tidy</strong> programming principles with pipe operators, leveraging the R packages from the <a href="https://www.tidyverse.org/"><strong>tidyverse</strong></a> like <strong>dplyr</strong>, <strong>tidyr</strong>, and <strong>ggplot2</strong>.</p>
-<p>For the modeling framework, however, we decided to use the <a href="https://mlr3book.mlr-org.com/"><strong>MLR3</strong></a> ecosystem.</p>
+<p>For the machine learning framework, we decided to use the <a href="https://mlr3book.mlr-org.com/"><strong>MLR3</strong></a> ecosystem.</p>
+<p>Alternatively, we have included a chemometrics chapter where the common tools and algorithms for working with spectral data are introduced. This was possible with the amazing package <a href="https://mdatools.com/docs/index.html"><strong>mdatools</strong></a>.</p>
+<p>We do, however, recommend that you keep an eye on this online training material as it keeps evolving in time and new methods may be incorporated.</p>
 <p>If you are interested in getting started in R using tidy packages and principles, we strongly recommend vising the <a href="https://r4ds.had.co.nz/"><strong>R 4 Data Science</strong></a> book page:</p>
 <ul>
 <li>For installing R and RStudio, it is recommended to check the <a href="https://r4ds.had.co.nz/introduction.html#prerequisites"><strong>Prerequisites </strong></a> page.<br>
@@ -690,7 +698,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>This handout was written by Jose L. Safanelli, Robert Minarik, Jonathan Sanderman, and Tomislav Hengl.</p>
+<p>This training material was written by Jose L. Safanelli, Robert Minarik, Tomislav Hengl, and Jonathan Sanderman.</p>
 </div>   
     <div class="nav-footer-center">
       &nbsp;
