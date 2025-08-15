@@ -1,38 +1,42 @@
 # Welcome! {.unnumbered}
 
-Welcome to our training on **Predictive Soil Spectroscopy**! This material was prepared for an in-person event held in St Louis, MO, at the [**ACS international meeting 2023**](https://www.acsmeetings.org/), but now it has been online so that anyone can reuse it.
+Welcome to our training guide on **Predictive Soil Spectroscopy**! This material was first published for an in-person workshop held in St Louis, MO, at the [**ACS international meeting 2023**](https://www.acsmeetings.org/).
 
-Soil spectroscopy, specifically [**Diffuse Reflectance Infrared (DRIFT) spectroscopy**](https://en.wikipedia.org/wiki/Diffuse_reflectance_infrared_Fourier_transform_spectroscopy), is rapidly becoming a routine tool for soil scientists in academia and in industry.
+Now it is a live guide so that anyone can access and reuse it!
 
-One of the most popular uses of soil spectroscopy is for the rapid and low-cost estimation of a number of key soil properties.
+Soil spectroscopy, specifically [**Diffuse Reflectance Spectroscopy**](https://en.wikipedia.org/wiki/Diffuse_reflectance_infrared_Fourier_transform_spectroscopy), is rapidly becoming a routine tool for soil analysis in academia and in industry.
 
-This workshop touch on the basics of soil spectroscopy including project design, considerations for building a spectral library, working with large public spectral libraries and model building, prediction, and interpretability.
+One of the most popular uses of soil spectroscopy is for the rapid and low-cost estimation of particle size distribution, carbon fractions, and clay minerals.
 
-Most of the learning will focus on using the freely available [**R programming language**](https://www.r-project.org/about.html).
+This guide touch on the basics of soil spectroscopy development including project design, considerations for building a spectral library, working with large and public spectral libraries, and predictive modeling.
 
-This material was prepared with R version `4.3.0` and it is recommended to use RStudio as the graphical user interface.
+Most of the learning will focus on using the free and open source [**R programming language**](https://www.r-project.org/about.html).
+
+This material was updated with R version `4.5`, and it is recommended to use RStudio as the graphical user interface.
 
 # Prerequisites {.unnumbered}
 
 This training is mostly focused on the use of **tidy** programming principles with pipe operators, leveraging the R packages from the [**tidyverse**](https://www.tidyverse.org/) like **dplyr**, **tidyr**, and **ggplot2**.
 
-For the machine learning framework, we decided to use the [**MLR3**](https://mlr3book.mlr-org.com/) ecosystem.
+For the machine learning framework, the first version of this guide was made with the [**MLR3**](https://mlr3book.mlr-org.com/) framework. However, we decided to switch to [**tidymodels**](https://www.tidymodels.org/) ecosystem as it has a simpler and more user-friendly interface.
 
-Alternatively, we have included a chemometrics chapter where the common tools and algorithms for working with spectral data are introduced. This was possible with the amazing package [**mdatools**](https://mdatools.com/docs/index.html).
+Alternatively, we have included a chemometrics chapter where some common tools and algorithms for working with spectral data are introduced. This was possible with the availability of the amazing package [**mdatools**](https://mdatools.com/docs/index.html).
 
-We do, however, recommend that you keep an eye on this online training material as it keeps evolving in time and new methods may be incorporated.
+We do, however, recommend that you keep an eye on this online material as it may evolve in time and new methods may be incorporated.
 
-If you are interested in getting started in R using tidy packages and principles, we strongly recommend vising the [**R 4 Data Science**](https://r4ds.had.co.nz/) book page:
+If you are interested in getting started in R using tidy packages and principles, we strongly recommend checking the [**R 4 Data Science**](https://r4ds.had.co.nz/) book page:
 
 - For installing R and RStudio, it is recommended to check the [**Prerequisites **](https://r4ds.had.co.nz/introduction.html#prerequisites) page.    
 - Learning how to set a basic project on RStudio is neatly described in [**Workflow: projects**](https://r4ds.had.co.nz/workflow-projects.html).  
 - We are going to have several demonstrations of data [**import**](https://r4ds.had.co.nz/data-import.html) and [**wrangling**](https://r4ds.had.co.nz/transform.html#transform) by piped operations, and plot visualizations with [**ggplot**](https://r4ds.had.co.nz/data-visualisation.html).  
 
-Other spectral operations, like importing raw files, preprocessing, compression, and modeling will be done with dedicated libraries, e.g., [**asdreader**](https://github.com/pierreroudier/asdreader), [**opusreader2**](https://spectral-cockpit.github.io/opusreader2/), [**prospectr**](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html), [**resemble**](https://cran.r-project.org/web/packages/resemble/vignettes/resemble.html), [**mlr3**](https://mlr3book.mlr-org.com/), and others.
+Other spectral operations, like importing raw spectral files, preprocessing, compression, and modeling can be done with dedicated libraries, e.g., [**asdreader**](https://github.com/pierreroudier/asdreader), [**opusreader2**](https://spectral-cockpit.github.io/opusreader2/), [**prospectr**](https://cran.r-project.org/web/packages/prospectr/vignettes/prospectr.html), [**resemble**](https://cran.r-project.org/web/packages/resemble/vignettes/resemble.html), [**tidymodels**](https://www.tidymodels.org/), and many others.
 
 # Recommended literature {.unnumbered}
 
-The fundamentals of infrared spectroscopy are well presented in [Johnston & Aochi (2018)](https://doi.org/10.2136/sssabookser5.3.c10) and [Stenberg & Viscarra-Rossel (2018)](https://doi.org/10.1007/978-90-481-8859-8_3), while [Wadoux et al. (2021)](https://doi.org/10.1007/978-3-030-64896-1) provides a great walk-through of soil spectral inference in R.
+Fundamentals of infrared spectroscopy are well presented in [Johnston & Aochi (2018)](https://doi.org/10.2136/sssabookser5.3.c10), [Stenberg & Viscarra-Rossel (2018)](https://doi.org/10.1007/978-90-481-8859-8_3), [Margenot et al. (2017)](http://dx.doi.org/10.1016/B978-0-12-409547-2.12170-5), [Pasquini (2003)](https://doi.org/10.1590/S0103-50532003000200006), while [Wadoux et al. (2021)](https://doi.org/10.1007/978-3-030-64896-1) dedicated a exclusive book with examples for soil spectral inference in R.
+
+Some recommended reading:
 
 - Johnston, C. T., & Aochi, Y. O. (2018). Fourier Transform Infrared and Raman Spectroscopy (pp. 269–321). <https://doi.org/10.2136/sssabookser5.3.c10>
 
@@ -40,13 +44,17 @@ The fundamentals of infrared spectroscopy are well presented in [Johnston & Aoch
 
 - Margenot A.J., Calderón F.J., Goyne K.W., Mukome F.N.D and Parikh S.J. (2017) IR Spectroscopy, Soil Analysis Applications. In: Lindon, J.C., Tranter, G.E., and Koppenaal, D.W. (eds.) The Encyclopedia of Spectroscopy and Spectrometry, 3rd edition vol. 2, pp. 448-454. Oxford: Academic Press. <http://dx.doi.org/10.1016/B978-0-12-409547-2.12170-5>
 
+- Pasquini, C. (2003). Near Infrared Spectroscopy: fundamentals, practical aspects and analytical applications. Journal of the Brazilian Chemical Society, 14(2), 198–219. <https://doi.org/10.1590/s0103-50532003000200006>
+
 - Wadoux, A. M. J.-C., Malone, B., Minasny, B., Fajardo, M., & McBratney, A. B. (2021). Soil Spectral Inference with R. In Progress in Soil Science. Springer International Publishing. <https://doi.org/10.1007/978-3-030-64896-1>
 
 - Ng, W., Minasny, B., Jeon, S. H., & McBratney, A. (2022). Mid-infrared spectroscopy for accurate measurement of an extensive set of soil properties for assessing soil functions. Soil Security, 6, 100043. <https://doi.org/10.1016/j.soisec.2022.100043>
 
 - Shepherd, K. D., Ferguson, R., Hoover, D., van Egmond, F., Sanderman, J., & Ge, Y. (2022). A global soil spectral calibration library and estimation service. Soil Security, 7, 100061. <https://doi.org/10.1016/j.soisec.2022.100061>
 
-- Soil Spectroscopy for Global Good. Open Soil Spectral Library. <https://soilspectroscopy.github.io/ossl-manual/>
+- Safanelli, J. L., Hengl, T., Parente, L. L., Minarik, R., Bloom, D. E., Todd-Brown, K., Gholizadeh, A., Mendes, W. de S., & Sanderman, J. (2025). Open Soil Spectral Library (OSSL): Building reproducible soil calibration models through open development and community engagement. PLOS ONE, 20(1), e0296545. <https://doi.org/10.1371/journal.pone.0296545>
+
+- Soil Spectroscopy for Global Good team. Open Soil Spectral Library. Available in <https://docs.soilspectroscopy.org/>.  <https://doi.org/10.5281/zenodo.5759693>
 
 # Disclaimer {.unnumbered}
 
@@ -64,6 +72,6 @@ This website/book and attached software is free to use, and is licensed under th
 
 # Citing
 
-José Lucas Safanelli, Robert Minarik, Jonathan Sanderman, Tomislav Hengl. Predictive Soil Spectroscopy. 2023. Available on: <https://soilspectroscopy.github.io/soilspec-workshop/>.
+José Lucas Safanelli, Robert Minarik, Jonathan Sanderman, and Tomislav Hengl. Predictive Soil Spectroscopy. 2023. Available at: <https://soilspectroscopy.github.io/soilspec-workshop/>.
 
 ![](img/cover.png){fig-align="center" width="50%"}
