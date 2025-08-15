@@ -1,13 +1,13 @@
 
 
-# Training workshop on predictive soil spectroscopy
+# Training material on predictive soil spectroscopy
 
-This is a repository for the training material used during the
-[**tri-society**](https://www.acsmeetings.org/) meeting in 2023. This
-training have been organized by the **Soil Spectroscopy for Global
-Good** initiative (SoilSpec4GG) and is freely available for reuse.
+This is a repository for the training material used during a workshop
+given at the [**tri-society**](https://www.acsmeetings.org/) meeting in
+2023. This tutorial has been organized by the **Soil Spectroscopy for
+Global Good** initiative (SS4GG) and has been updated for reuse.
 
-**SoilSpec4GG** is funded by the [USDA National Institute of Food and
+**SS4GG** is funded by the [USDA National Institute of Food and
 Agriculture award
 \#2020-67021-32467](https://cris.nifa.usda.gov/cgi-bin/starfinder/0?path=fastlink1.txt&id=anon&pass=&search=R=89483&format=WEBFMT6NT).
 
